@@ -1,0 +1,583 @@
+=== openai:gpt-4o | choose_bid ===
+System prompt: You are a strong Wizard player focusing on accurate bidding. You want to maximize your final score, not just win individual rounds. Always output valid JSON.
+
+Prompt:
+You are playing the trick-taking card game Wizard. You must respect the game rules at all times.
+
+Decide how many tricks you expect to win this round.
+Legal bids are integers from 0 to 1 inclusive.
+Return a JSON object: {"bid": <integer>}.
+Do NOT include any explanations, only JSON.
+
+Here is a JSON description of the current game state from your perspective:
+{
+  "bids_so_far": {},
+  "game": {
+    "cards_per_player": 1,
+    "num_players": 4,
+    "round_index": 0
+  },
+  "hand": [
+    {
+      "rank": 13,
+      "suit": "DWARVES",
+      "type": "number"
+    }
+  ],
+  "phase": "bidding",
+  "player": {
+    "id": 0,
+    "name": "openai:gpt-4o",
+    "score": 0
+  },
+  "scores": {
+    "0": 0,
+    "1": 0,
+    "2": 0,
+    "3": 0
+  },
+  "trump": {
+    "card": {
+      "rank": 4,
+      "suit": "ELVES",
+      "type": "number"
+    },
+    "suit": "ELVES"
+  }
+}
+
+Respond ONLY with a single JSON object and nothing else.
+
+Raw output:
+```json
+{"bid": 1}
+```
+
+Parsed JSON:
+{'bid': 1}
+
+=== anthropic:claude-3-5-haiku-latest | choose_bid ===
+System prompt: You are a strong Wizard player focusing on accurate bidding. You want to maximize your final score, not just win individual rounds. Always output valid JSON.
+
+Prompt:
+You are playing the trick-taking card game Wizard. You must respect the game rules at all times.
+
+Decide how many tricks you expect to win this round.
+Legal bids are integers from 0 to 1 inclusive.
+Return a JSON object: {"bid": <integer>}.
+Do NOT include any explanations, only JSON.
+
+Here is a JSON description of the current game state from your perspective:
+{
+  "bids_so_far": {
+    "0": 1
+  },
+  "game": {
+    "cards_per_player": 1,
+    "num_players": 4,
+    "round_index": 0
+  },
+  "hand": [
+    {
+      "rank": 11,
+      "suit": "ELVES",
+      "type": "number"
+    }
+  ],
+  "phase": "bidding",
+  "player": {
+    "id": 1,
+    "name": "anthropic:claude-3-5-haiku-latest",
+    "score": 0
+  },
+  "scores": {
+    "0": 0,
+    "1": 0,
+    "2": 0,
+    "3": 0
+  },
+  "trump": {
+    "card": {
+      "rank": 4,
+      "suit": "ELVES",
+      "type": "number"
+    },
+    "suit": "ELVES"
+  }
+}
+
+Respond ONLY with a single JSON object and nothing else.
+
+Raw output:
+{"bid": 1}
+
+Parsed JSON:
+{'bid': 1}
+
+=== gemini:gemini-2.5-flash-lite | choose_bid ===
+System prompt: You are a strong Wizard player focusing on accurate bidding. You want to maximize your final score, not just win individual rounds. Always output valid JSON.
+
+Prompt:
+You are playing the trick-taking card game Wizard. You must respect the game rules at all times.
+
+Decide how many tricks you expect to win this round.
+Legal bids are integers from 0 to 1 inclusive.
+Return a JSON object: {"bid": <integer>}.
+Do NOT include any explanations, only JSON.
+
+Here is a JSON description of the current game state from your perspective:
+{
+  "bids_so_far": {
+    "0": 1,
+    "1": 1
+  },
+  "game": {
+    "cards_per_player": 1,
+    "num_players": 4,
+    "round_index": 0
+  },
+  "hand": [
+    {
+      "rank": null,
+      "suit": null,
+      "type": "wizard"
+    }
+  ],
+  "phase": "bidding",
+  "player": {
+    "id": 2,
+    "name": "gemini:gemini-2.5-flash-lite",
+    "score": 0
+  },
+  "scores": {
+    "0": 0,
+    "1": 0,
+    "2": 0,
+    "3": 0
+  },
+  "trump": {
+    "card": {
+      "rank": 4,
+      "suit": "ELVES",
+      "type": "number"
+    },
+    "suit": "ELVES"
+  }
+}
+
+Respond ONLY with a single JSON object and nothing else.
+
+Raw output:
+{"bid": 1}
+
+Parsed JSON:
+{'bid': 1}
+
+=== grok:grok-4-fast-non-reasoning | choose_bid ===
+System prompt: You are a strong Wizard player focusing on accurate bidding. You want to maximize your final score, not just win individual rounds. Always output valid JSON.
+
+Prompt:
+You are playing the trick-taking card game Wizard. You must respect the game rules at all times.
+
+Decide how many tricks you expect to win this round.
+Legal bids are integers from 0 to 1 inclusive.
+Return a JSON object: {"bid": <integer>}.
+Do NOT include any explanations, only JSON.
+
+Here is a JSON description of the current game state from your perspective:
+{
+  "bids_so_far": {
+    "0": 1,
+    "1": 1,
+    "2": 1
+  },
+  "game": {
+    "cards_per_player": 1,
+    "num_players": 4,
+    "round_index": 0
+  },
+  "hand": [
+    {
+      "rank": 12,
+      "suit": "HUMANS",
+      "type": "number"
+    }
+  ],
+  "phase": "bidding",
+  "player": {
+    "id": 3,
+    "name": "grok:grok-4-fast-non-reasoning",
+    "score": 0
+  },
+  "scores": {
+    "0": 0,
+    "1": 0,
+    "2": 0,
+    "3": 0
+  },
+  "trump": {
+    "card": {
+      "rank": 4,
+      "suit": "ELVES",
+      "type": "number"
+    },
+    "suit": "ELVES"
+  }
+}
+
+Respond ONLY with a single JSON object and nothing else.
+
+Raw output:
+{"bid":1}
+
+Parsed JSON:
+{'bid': 1}
+
+=== anthropic:claude-3-5-haiku-latest | choose_card ===
+System prompt: You are choosing which card to play for this trick in Wizard. The environment has already computed `legal_move_indices`, which are the indices in your hand that you are allowed to play. You must pick one of those indices. Always output valid JSON.
+
+Prompt:
+You are playing the trick-taking card game Wizard. You must respect the game rules at all times.
+
+Pick exactly one integer index from the `legal_move_indices` list in the observation.
+Return JSON: {"card_index": <integer>}.
+Do NOT include any explanations, only JSON.
+
+Here is a JSON description of the current game state from your perspective:
+{
+  "bids": {
+    "0": 1,
+    "1": 1,
+    "2": 1,
+    "3": 1
+  },
+  "current_trick": {
+    "led_suit": null,
+    "plays": []
+  },
+  "game": {
+    "cards_per_player": 1,
+    "num_players": 4,
+    "round_index": 0
+  },
+  "hand": [
+    {
+      "rank": 11,
+      "suit": "ELVES",
+      "type": "number"
+    }
+  ],
+  "legal_move_indices": [
+    0
+  ],
+  "phase": "play",
+  "player": {
+    "id": 1,
+    "name": "anthropic:claude-3-5-haiku-latest",
+    "score": 0
+  },
+  "scores": {
+    "0": 0,
+    "1": 0,
+    "2": 0,
+    "3": 0
+  },
+  "trick_index": 0,
+  "tricks_taken_so_far": {
+    "0": 0,
+    "1": 0,
+    "2": 0,
+    "3": 0
+  },
+  "trump": {
+    "card": {
+      "rank": 4,
+      "suit": "ELVES",
+      "type": "number"
+    },
+    "suit": "ELVES"
+  }
+}
+
+Respond ONLY with a single JSON object and nothing else.
+
+Raw output:
+{"card_index": 0}
+
+Parsed JSON:
+{'card_index': 0}
+
+=== gemini:gemini-2.5-flash-lite | choose_card ===
+System prompt: You are choosing which card to play for this trick in Wizard. The environment has already computed `legal_move_indices`, which are the indices in your hand that you are allowed to play. You must pick one of those indices. Always output valid JSON.
+
+Prompt:
+You are playing the trick-taking card game Wizard. You must respect the game rules at all times.
+
+Pick exactly one integer index from the `legal_move_indices` list in the observation.
+Return JSON: {"card_index": <integer>}.
+Do NOT include any explanations, only JSON.
+
+Here is a JSON description of the current game state from your perspective:
+{
+  "bids": {
+    "0": 1,
+    "1": 1,
+    "2": 1,
+    "3": 1
+  },
+  "current_trick": {
+    "led_suit": "ELVES",
+    "plays": [
+      {
+        "card": {
+          "rank": 11,
+          "suit": "ELVES",
+          "type": "number"
+        },
+        "player_id": 1
+      }
+    ]
+  },
+  "game": {
+    "cards_per_player": 1,
+    "num_players": 4,
+    "round_index": 0
+  },
+  "hand": [
+    {
+      "rank": null,
+      "suit": null,
+      "type": "wizard"
+    }
+  ],
+  "legal_move_indices": [
+    0
+  ],
+  "phase": "play",
+  "player": {
+    "id": 2,
+    "name": "gemini:gemini-2.5-flash-lite",
+    "score": 0
+  },
+  "scores": {
+    "0": 0,
+    "1": 0,
+    "2": 0,
+    "3": 0
+  },
+  "trick_index": 0,
+  "tricks_taken_so_far": {
+    "0": 0,
+    "1": 0,
+    "2": 0,
+    "3": 0
+  },
+  "trump": {
+    "card": {
+      "rank": 4,
+      "suit": "ELVES",
+      "type": "number"
+    },
+    "suit": "ELVES"
+  }
+}
+
+Respond ONLY with a single JSON object and nothing else.
+
+Raw output:
+{"card_index": 0}
+
+Parsed JSON:
+{'card_index': 0}
+
+=== grok:grok-4-fast-non-reasoning | choose_card ===
+System prompt: You are choosing which card to play for this trick in Wizard. The environment has already computed `legal_move_indices`, which are the indices in your hand that you are allowed to play. You must pick one of those indices. Always output valid JSON.
+
+Prompt:
+You are playing the trick-taking card game Wizard. You must respect the game rules at all times.
+
+Pick exactly one integer index from the `legal_move_indices` list in the observation.
+Return JSON: {"card_index": <integer>}.
+Do NOT include any explanations, only JSON.
+
+Here is a JSON description of the current game state from your perspective:
+{
+  "bids": {
+    "0": 1,
+    "1": 1,
+    "2": 1,
+    "3": 1
+  },
+  "current_trick": {
+    "led_suit": "ELVES",
+    "plays": [
+      {
+        "card": {
+          "rank": 11,
+          "suit": "ELVES",
+          "type": "number"
+        },
+        "player_id": 1
+      },
+      {
+        "card": {
+          "rank": null,
+          "suit": null,
+          "type": "wizard"
+        },
+        "player_id": 2
+      }
+    ]
+  },
+  "game": {
+    "cards_per_player": 1,
+    "num_players": 4,
+    "round_index": 0
+  },
+  "hand": [
+    {
+      "rank": 12,
+      "suit": "HUMANS",
+      "type": "number"
+    }
+  ],
+  "legal_move_indices": [
+    0
+  ],
+  "phase": "play",
+  "player": {
+    "id": 3,
+    "name": "grok:grok-4-fast-non-reasoning",
+    "score": 0
+  },
+  "scores": {
+    "0": 0,
+    "1": 0,
+    "2": 0,
+    "3": 0
+  },
+  "trick_index": 0,
+  "tricks_taken_so_far": {
+    "0": 0,
+    "1": 0,
+    "2": 0,
+    "3": 0
+  },
+  "trump": {
+    "card": {
+      "rank": 4,
+      "suit": "ELVES",
+      "type": "number"
+    },
+    "suit": "ELVES"
+  }
+}
+
+Respond ONLY with a single JSON object and nothing else.
+
+Raw output:
+{"card_index": 0}
+
+Parsed JSON:
+{'card_index': 0}
+
+=== openai:gpt-4o | choose_card ===
+System prompt: You are choosing which card to play for this trick in Wizard. The environment has already computed `legal_move_indices`, which are the indices in your hand that you are allowed to play. You must pick one of those indices. Always output valid JSON.
+
+Prompt:
+You are playing the trick-taking card game Wizard. You must respect the game rules at all times.
+
+Pick exactly one integer index from the `legal_move_indices` list in the observation.
+Return JSON: {"card_index": <integer>}.
+Do NOT include any explanations, only JSON.
+
+Here is a JSON description of the current game state from your perspective:
+{
+  "bids": {
+    "0": 1,
+    "1": 1,
+    "2": 1,
+    "3": 1
+  },
+  "current_trick": {
+    "led_suit": "ELVES",
+    "plays": [
+      {
+        "card": {
+          "rank": 11,
+          "suit": "ELVES",
+          "type": "number"
+        },
+        "player_id": 1
+      },
+      {
+        "card": {
+          "rank": null,
+          "suit": null,
+          "type": "wizard"
+        },
+        "player_id": 2
+      },
+      {
+        "card": {
+          "rank": 12,
+          "suit": "HUMANS",
+          "type": "number"
+        },
+        "player_id": 3
+      }
+    ]
+  },
+  "game": {
+    "cards_per_player": 1,
+    "num_players": 4,
+    "round_index": 0
+  },
+  "hand": [
+    {
+      "rank": 13,
+      "suit": "DWARVES",
+      "type": "number"
+    }
+  ],
+  "legal_move_indices": [
+    0
+  ],
+  "phase": "play",
+  "player": {
+    "id": 0,
+    "name": "openai:gpt-4o",
+    "score": 0
+  },
+  "scores": {
+    "0": 0,
+    "1": 0,
+    "2": 0,
+    "3": 0
+  },
+  "trick_index": 0,
+  "tricks_taken_so_far": {
+    "0": 0,
+    "1": 0,
+    "2": 0,
+    "3": 0
+  },
+  "trump": {
+    "card": {
+      "rank": 4,
+      "suit": "ELVES",
+      "type": "number"
+    },
+    "suit": "ELVES"
+  }
+}
+
+Respond ONLY with a single JSON object and nothing else.
+
+Raw output:
+```json
+{"card_index": 0}
+```
+
+Parsed JSON:
+{'card_index': 0}
