@@ -1,1 +1,2 @@
 verbose_seed1_50games.txt filter=lfs diff=lfs merge=lfs -text
+wizard_arena/results/wizard_results_60_games_verbose.log filter=lfs diff=lfs merge=lfs -text

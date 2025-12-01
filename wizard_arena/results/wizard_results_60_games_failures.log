@@ -1,0 +1,6563 @@
+=== Agent: openai:gpt-4o-mini | Purpose: choose_card | Game: game-53 | Round: 14 | Phase: play ===
+Error: LLM API failure after 5 attempts: Error code: 429 - {'error': {'message': 'Rate limit reached for gpt-4o-mini in organization org-Eo76H3MXPiEhUOlI7o1YBPZb on requests per day (RPD): Limit 10000, Used 10000, Requested 1. Please try again in 8.64s. Visit https://platform.openai.com/account/rate-limits to learn more.', 'type': 'requests', 'param': None, 'code': 'rate_limit_exceeded'}}
+
+Prompt:
+You are playing the trick-taking card game Wizard. You must respect the game rules at all times.
+
+Essentials:
+- 60-card deck: suits RED/BLUE/GREEN/YELLOW (number cards 1–13), plus 4 WIZARD and 4 JESTER cards (no suit).
+- Trump: if the face-up card is a NUMBER, its suit is trump; if it is a JESTER, there is NO TRUMP; if it is a WIZARD, the dealer chooses any trump suit; in the last round there is NO TRUMP.
+- Trick lead: the first NUMBER card played in a trick sets the led suit, unless the trick is led with a WIZARD (no led suit is set).
+- If you have any NUMBER cards in the led suit you must play one of them, except that you may always play a WIZARD or JESTER instead.
+- If there is no led suit yet (for example because the trick was led with a WIZARD or JESTER and no NUMBER has been played), any card is legal.
+- Trick winner: if any WIZARD is played, the earliest WIZARD wins; otherwise, if there is a trump suit, the highest NUMBER in the trump suit wins; otherwise, the highest NUMBER in the led suit wins; if all cards are JESTERs, the earliest JESTER wins.
+- Card indices in your hand are 0-indexed; you may only choose an index from `legal_move_indices` when playing a card.
+- Objective: by the end of the round, win exactly the number of tricks you bid (no more and no less).
+- Scoring: if tricks_won == bid then your score change is +20 + 10 * bid; otherwise your score change is -10 * abs(tricks_won - bid). Total score is cumulative across rounds.
+- Information: you see only your own hand plus public data (trump, bids, tricks, scores). The environment has already computed `legal_move_indices` for valid plays.
+
+Follow the Wizard rules above exactly. They are fixed for this entire game and do not change between turns.
+
+Quick state digest (for fast reference; use the JSON below for full details):
+
+Player 2 bid: 3; tricks_won: 0; Trump: GREEN; Current trick leader: 1; Cards in hand: 12; Legal moves: [1, 2, 3, 6, 7, 8] -> 1: YELLOW 6, 2: YELLOW 1, 3: YELLOW 8, 6: YELLOW 5, 7: YELLOW 13, 8: YELLOW 10
+
+Pick exactly one integer index from the `legal_move_indices` list in the observation. Card indices are 0-indexed within your current hand.
+Hand with indices: 0: BLUE 6, 1: YELLOW 6, 2: YELLOW 1, 3: YELLOW 8, 4: RED 8, 5: RED 2, 6: YELLOW 5, 7: YELLOW 13, 8: YELLOW 10, 9: BLUE 8, 10: RED 4, 11: BLUE 12
+Legal move options (index -> card): 1: YELLOW 6, 2: YELLOW 1, 3: YELLOW 8, 6: YELLOW 5, 7: YELLOW 13, 8: YELLOW 10
+Scoring reminder: if tricks_won == bid your score goes up by 20 + 10 * bid; otherwise your score decreases by 10 * abs(tricks_won - bid).
+If you include a rationale, keep it short, then end with FINAL_JSON: {"card_index": <integer>} with nothing after the closing brace.
+
+Here is a JSON description of the current game state from your perspective:
+
+{
+  "bids": {
+    "0": 4,
+    "1": 3,
+    "2": 3
+  },
+  "current_trick": {
+    "led_suit": "YELLOW",
+    "plays": [
+      {
+        "card": {
+          "rank": 2,
+          "suit": "YELLOW",
+          "type": "number"
+        },
+        "player_id": 1
+      }
+    ]
+  },
+  "game": {
+    "cards_per_player": 15,
+    "dealer_id": 2,
+    "game_id": "game-53",
+    "num_players": 3,
+    "round_index": 14
+  },
+  "hand": [
+    {
+      "rank": 6,
+      "suit": "BLUE",
+      "type": "number"
+    },
+    {
+      "rank": 6,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 1,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 8,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 8,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 2,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 5,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 13,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 10,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 8,
+      "suit": "BLUE",
+      "type": "number"
+    },
+    {
+      "rank": 4,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 12,
+      "suit": "BLUE",
+      "type": "number"
+    }
+  ],
+  "hand_sizes": {
+    "0": 12,
+    "1": 11,
+    "2": 12
+  },
+  "leader_id": 1,
+  "legal_move_indices": [
+    1,
+    2,
+    3,
+    6,
+    7,
+    8
+  ],
+  "phase": "play",
+  "player": {
+    "id": 2,
+    "name": "openai:gpt-4o-mini",
+    "score": -60
+  },
+  "player_names": {
+    "0": "anthropic:claude-3-5-haiku-latest",
+    "1": "gemini:gemini-2.0-flash",
+    "2": "openai:gpt-4o-mini"
+  },
+  "scores": {
+    "0": -20,
+    "1": -180,
+    "2": -60
+  },
+  "seating_order": [
+    0,
+    1,
+    2
+  ],
+  "trick_history": [
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 5,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 9,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 4,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 2
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": null,
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 11,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 9,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": null,
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 13,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 1
+    }
+  ],
+  "trick_index": 3,
+  "tricks_taken_so_far": {
+    "0": 0,
+    "1": 3,
+    "2": 0
+  },
+  "trump": {
+    "card": {
+      "rank": 11,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    "suit": "GREEN"
+  }
+}
+
+Keep any reasoning to a few sentences at most. End with `FINAL_JSON:` followed by ONLY the JSON object; after the `FINAL_JSON:` label, no other text or punctuation should appear after the closing brace.
+
+Observation JSON:
+{
+  "bids": {
+    "0": 4,
+    "1": 3,
+    "2": 3
+  },
+  "current_trick": {
+    "led_suit": "YELLOW",
+    "plays": [
+      {
+        "card": {
+          "rank": 2,
+          "suit": "YELLOW",
+          "type": "number"
+        },
+        "player_id": 1
+      }
+    ]
+  },
+  "game": {
+    "cards_per_player": 15,
+    "dealer_id": 2,
+    "game_id": "game-53",
+    "num_players": 3,
+    "round_index": 14
+  },
+  "hand": [
+    {
+      "rank": 6,
+      "suit": "BLUE",
+      "type": "number"
+    },
+    {
+      "rank": 6,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 1,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 8,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 8,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 2,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 5,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 13,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 10,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 8,
+      "suit": "BLUE",
+      "type": "number"
+    },
+    {
+      "rank": 4,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 12,
+      "suit": "BLUE",
+      "type": "number"
+    }
+  ],
+  "hand_sizes": {
+    "0": 12,
+    "1": 11,
+    "2": 12
+  },
+  "leader_id": 1,
+  "legal_move_indices": [
+    1,
+    2,
+    3,
+    6,
+    7,
+    8
+  ],
+  "phase": "play",
+  "player": {
+    "id": 2,
+    "name": "openai:gpt-4o-mini",
+    "score": -60
+  },
+  "player_names": {
+    "0": "anthropic:claude-3-5-haiku-latest",
+    "1": "gemini:gemini-2.0-flash",
+    "2": "openai:gpt-4o-mini"
+  },
+  "scores": {
+    "0": -20,
+    "1": -180,
+    "2": -60
+  },
+  "seating_order": [
+    0,
+    1,
+    2
+  ],
+  "trick_history": [
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 5,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 9,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 4,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 2
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": null,
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 11,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 9,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": null,
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 13,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 1
+    }
+  ],
+  "trick_index": 3,
+  "tricks_taken_so_far": {
+    "0": 0,
+    "1": 3,
+    "2": 0
+  },
+  "trump": {
+    "card": {
+      "rank": 11,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    "suit": "GREEN"
+  }
+}
+
+=== Agent: openai:gpt-4o-mini | Purpose: choose_card | Game: game-52 | Round: 10 | Phase: play ===
+Error: LLM API failure after 5 attempts: Error code: 429 - {'error': {'message': 'Rate limit reached for gpt-4o-mini in organization org-Eo76H3MXPiEhUOlI7o1YBPZb on requests per day (RPD): Limit 10000, Used 10000, Requested 1. Please try again in 8.64s. Visit https://platform.openai.com/account/rate-limits to learn more.', 'type': 'requests', 'param': None, 'code': 'rate_limit_exceeded'}}
+
+Prompt:
+You are playing the trick-taking card game Wizard. You must respect the game rules at all times.
+
+Essentials:
+- 60-card deck: suits RED/BLUE/GREEN/YELLOW (number cards 1–13), plus 4 WIZARD and 4 JESTER cards (no suit).
+- Trump: if the face-up card is a NUMBER, its suit is trump; if it is a JESTER, there is NO TRUMP; if it is a WIZARD, the dealer chooses any trump suit; in the last round there is NO TRUMP.
+- Trick lead: the first NUMBER card played in a trick sets the led suit, unless the trick is led with a WIZARD (no led suit is set).
+- If you have any NUMBER cards in the led suit you must play one of them, except that you may always play a WIZARD or JESTER instead.
+- If there is no led suit yet (for example because the trick was led with a WIZARD or JESTER and no NUMBER has been played), any card is legal.
+- Trick winner: if any WIZARD is played, the earliest WIZARD wins; otherwise, if there is a trump suit, the highest NUMBER in the trump suit wins; otherwise, the highest NUMBER in the led suit wins; if all cards are JESTERs, the earliest JESTER wins.
+- Card indices in your hand are 0-indexed; you may only choose an index from `legal_move_indices` when playing a card.
+- Objective: by the end of the round, win exactly the number of tricks you bid (no more and no less).
+- Scoring: if tricks_won == bid then your score change is +20 + 10 * bid; otherwise your score change is -10 * abs(tricks_won - bid). Total score is cumulative across rounds.
+- Information: you see only your own hand plus public data (trump, bids, tricks, scores). The environment has already computed `legal_move_indices` for valid plays.
+
+Follow the Wizard rules above exactly. They are fixed for this entire game and do not change between turns.
+
+Quick state digest (for fast reference; use the JSON below for full details):
+
+Player 2 bid: 2; tricks_won: 5; Trump: YELLOW; Current trick leader: 1; Cards in hand: 2; Legal moves: [0, 1] -> 0: RED 4, 1: GREEN 4
+
+Pick exactly one integer index from the `legal_move_indices` list in the observation. Card indices are 0-indexed within your current hand.
+Hand with indices: 0: RED 4, 1: GREEN 4
+Legal move options (index -> card): 0: RED 4, 1: GREEN 4
+Scoring reminder: if tricks_won == bid your score goes up by 20 + 10 * bid; otherwise your score decreases by 10 * abs(tricks_won - bid).
+If you include a rationale, keep it short, then end with FINAL_JSON: {"card_index": <integer>} with nothing after the closing brace.
+
+Here is a JSON description of the current game state from your perspective:
+
+{
+  "bids": {
+    "0": 0,
+    "1": 3,
+    "2": 2
+  },
+  "current_trick": {
+    "led_suit": "BLUE",
+    "plays": [
+      {
+        "card": {
+          "rank": 10,
+          "suit": "BLUE",
+          "type": "number"
+        },
+        "player_id": 1
+      }
+    ]
+  },
+  "game": {
+    "cards_per_player": 11,
+    "dealer_id": 1,
+    "game_id": "game-52",
+    "num_players": 3,
+    "round_index": 10
+  },
+  "hand": [
+    {
+      "rank": 4,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 4,
+      "suit": "GREEN",
+      "type": "number"
+    }
+  ],
+  "hand_sizes": {
+    "0": 2,
+    "1": 1,
+    "2": 2
+  },
+  "leader_id": 1,
+  "legal_move_indices": [
+    0,
+    1
+  ],
+  "phase": "play",
+  "player": {
+    "id": 2,
+    "name": "openai:gpt-4o-mini",
+    "score": -110
+  },
+  "player_names": {
+    "0": "gemini:gemini-2.0-flash",
+    "1": "anthropic:claude-3-5-haiku-latest",
+    "2": "openai:gpt-4o-mini"
+  },
+  "scores": {
+    "0": -70,
+    "1": 30,
+    "2": -110
+  },
+  "seating_order": [
+    0,
+    1,
+    2
+  ],
+  "trick_history": [
+    {
+      "led_suit": null,
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "jester"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 9,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": null,
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 2,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "BLUE",
+      "plays": [
+        {
+          "card": {
+            "rank": 13,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 6,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 12,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "YELLOW",
+      "plays": [
+        {
+          "card": {
+            "rank": 12,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 1,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 8,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "RED",
+      "plays": [
+        {
+          "card": {
+            "rank": 11,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 12,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 1,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 0
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 10,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 2,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 9,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 2
+        }
+      ],
+      "winner_id": 0
+    },
+    {
+      "led_suit": "RED",
+      "plays": [
+        {
+          "card": {
+            "rank": 3,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 6,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 8,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 2
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 8,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 7,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 12,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": "YELLOW",
+      "plays": [
+        {
+          "card": {
+            "rank": 10,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 4,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 5,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 1
+    }
+  ],
+  "trick_index": 9,
+  "tricks_taken_so_far": {
+    "0": 2,
+    "1": 2,
+    "2": 5
+  },
+  "trump": {
+    "card": {
+      "rank": 6,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    "suit": "YELLOW"
+  }
+}
+
+Keep any reasoning to a few sentences at most. End with `FINAL_JSON:` followed by ONLY the JSON object; after the `FINAL_JSON:` label, no other text or punctuation should appear after the closing brace.
+
+Observation JSON:
+{
+  "bids": {
+    "0": 0,
+    "1": 3,
+    "2": 2
+  },
+  "current_trick": {
+    "led_suit": "BLUE",
+    "plays": [
+      {
+        "card": {
+          "rank": 10,
+          "suit": "BLUE",
+          "type": "number"
+        },
+        "player_id": 1
+      }
+    ]
+  },
+  "game": {
+    "cards_per_player": 11,
+    "dealer_id": 1,
+    "game_id": "game-52",
+    "num_players": 3,
+    "round_index": 10
+  },
+  "hand": [
+    {
+      "rank": 4,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 4,
+      "suit": "GREEN",
+      "type": "number"
+    }
+  ],
+  "hand_sizes": {
+    "0": 2,
+    "1": 1,
+    "2": 2
+  },
+  "leader_id": 1,
+  "legal_move_indices": [
+    0,
+    1
+  ],
+  "phase": "play",
+  "player": {
+    "id": 2,
+    "name": "openai:gpt-4o-mini",
+    "score": -110
+  },
+  "player_names": {
+    "0": "gemini:gemini-2.0-flash",
+    "1": "anthropic:claude-3-5-haiku-latest",
+    "2": "openai:gpt-4o-mini"
+  },
+  "scores": {
+    "0": -70,
+    "1": 30,
+    "2": -110
+  },
+  "seating_order": [
+    0,
+    1,
+    2
+  ],
+  "trick_history": [
+    {
+      "led_suit": null,
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "jester"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 9,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": null,
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 2,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "BLUE",
+      "plays": [
+        {
+          "card": {
+            "rank": 13,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 6,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 12,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "YELLOW",
+      "plays": [
+        {
+          "card": {
+            "rank": 12,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 1,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 8,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "RED",
+      "plays": [
+        {
+          "card": {
+            "rank": 11,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 12,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 1,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 0
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 10,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 2,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 9,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 2
+        }
+      ],
+      "winner_id": 0
+    },
+    {
+      "led_suit": "RED",
+      "plays": [
+        {
+          "card": {
+            "rank": 3,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 6,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 8,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 2
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 8,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 7,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 12,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": "YELLOW",
+      "plays": [
+        {
+          "card": {
+            "rank": 10,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 4,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 5,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 1
+    }
+  ],
+  "trick_index": 9,
+  "tricks_taken_so_far": {
+    "0": 2,
+    "1": 2,
+    "2": 5
+  },
+  "trump": {
+    "card": {
+      "rank": 6,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    "suit": "YELLOW"
+  }
+}
+
+=== Agent: openai:gpt-4o-mini | Purpose: choose_card | Game: game-54 | Round: 13 | Phase: play ===
+Error: LLM API failure after 5 attempts: Error code: 429 - {'error': {'message': 'Rate limit reached for gpt-4o-mini in organization org-Eo76H3MXPiEhUOlI7o1YBPZb on requests per day (RPD): Limit 10000, Used 10000, Requested 1. Please try again in 8.64s. Visit https://platform.openai.com/account/rate-limits to learn more.', 'type': 'requests', 'param': None, 'code': 'rate_limit_exceeded'}}
+
+Prompt:
+You are playing the trick-taking card game Wizard. You must respect the game rules at all times.
+
+Essentials:
+- 60-card deck: suits RED/BLUE/GREEN/YELLOW (number cards 1–13), plus 4 WIZARD and 4 JESTER cards (no suit).
+- Trump: if the face-up card is a NUMBER, its suit is trump; if it is a JESTER, there is NO TRUMP; if it is a WIZARD, the dealer chooses any trump suit; in the last round there is NO TRUMP.
+- Trick lead: the first NUMBER card played in a trick sets the led suit, unless the trick is led with a WIZARD (no led suit is set).
+- If you have any NUMBER cards in the led suit you must play one of them, except that you may always play a WIZARD or JESTER instead.
+- If there is no led suit yet (for example because the trick was led with a WIZARD or JESTER and no NUMBER has been played), any card is legal.
+- Trick winner: if any WIZARD is played, the earliest WIZARD wins; otherwise, if there is a trump suit, the highest NUMBER in the trump suit wins; otherwise, the highest NUMBER in the led suit wins; if all cards are JESTERs, the earliest JESTER wins.
+- Card indices in your hand are 0-indexed; you may only choose an index from `legal_move_indices` when playing a card.
+- Objective: by the end of the round, win exactly the number of tricks you bid (no more and no less).
+- Scoring: if tricks_won == bid then your score change is +20 + 10 * bid; otherwise your score change is -10 * abs(tricks_won - bid). Total score is cumulative across rounds.
+- Information: you see only your own hand plus public data (trump, bids, tricks, scores). The environment has already computed `legal_move_indices` for valid plays.
+
+Follow the Wizard rules above exactly. They are fixed for this entire game and do not change between turns.
+
+Quick state digest (for fast reference; use the JSON below for full details):
+
+Player 1 bid: 2; tricks_won: 2; Trump: RED; Current trick leader: 0; Cards in hand: 4; Legal moves: [0, 2, 3] -> 0: BLUE 1, 2: BLUE 4, 3: BLUE 2
+
+Pick exactly one integer index from the `legal_move_indices` list in the observation. Card indices are 0-indexed within your current hand.
+Hand with indices: 0: BLUE 1, 1: RED 6, 2: BLUE 4, 3: BLUE 2
+Legal move options (index -> card): 0: BLUE 1, 2: BLUE 4, 3: BLUE 2
+Scoring reminder: if tricks_won == bid your score goes up by 20 + 10 * bid; otherwise your score decreases by 10 * abs(tricks_won - bid).
+If you include a rationale, keep it short, then end with FINAL_JSON: {"card_index": <integer>} with nothing after the closing brace.
+
+Here is a JSON description of the current game state from your perspective:
+
+{
+  "bids": {
+    "0": 4,
+    "1": 2,
+    "2": 1
+  },
+  "current_trick": {
+    "led_suit": "BLUE",
+    "plays": [
+      {
+        "card": {
+          "rank": 6,
+          "suit": "BLUE",
+          "type": "number"
+        },
+        "player_id": 0
+      }
+    ]
+  },
+  "game": {
+    "cards_per_player": 14,
+    "dealer_id": 1,
+    "game_id": "game-54",
+    "num_players": 3,
+    "round_index": 13
+  },
+  "hand": [
+    {
+      "rank": 1,
+      "suit": "BLUE",
+      "type": "number"
+    },
+    {
+      "rank": 6,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 4,
+      "suit": "BLUE",
+      "type": "number"
+    },
+    {
+      "rank": 2,
+      "suit": "BLUE",
+      "type": "number"
+    }
+  ],
+  "hand_sizes": {
+    "0": 3,
+    "1": 4,
+    "2": 4
+  },
+  "leader_id": 0,
+  "legal_move_indices": [
+    0,
+    2,
+    3
+  ],
+  "phase": "play",
+  "player": {
+    "id": 1,
+    "name": "openai:gpt-4o-mini",
+    "score": 20
+  },
+  "player_names": {
+    "0": "anthropic:claude-3-5-haiku-latest",
+    "1": "openai:gpt-4o-mini",
+    "2": "gemini:gemini-2.0-flash"
+  },
+  "scores": {
+    "0": -30,
+    "1": 20,
+    "2": -30
+  },
+  "seating_order": [
+    0,
+    1,
+    2
+  ],
+  "trick_history": [
+    {
+      "led_suit": "YELLOW",
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "jester"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 7,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": "RED",
+      "plays": [
+        {
+          "card": {
+            "rank": 11,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 13,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 0
+    },
+    {
+      "led_suit": "RED",
+      "plays": [
+        {
+          "card": {
+            "rank": 7,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 4,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 1,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 2
+        }
+      ],
+      "winner_id": 0
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 8,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 5,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 6,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 2
+        }
+      ],
+      "winner_id": 0
+    },
+    {
+      "led_suit": "YELLOW",
+      "plays": [
+        {
+          "card": {
+            "rank": 5,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 13,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 2
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "YELLOW",
+      "plays": [
+        {
+          "card": {
+            "rank": 2,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 12,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 10,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 0
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 1,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 13,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 7,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 2
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": "BLUE",
+      "plays": [
+        {
+          "card": {
+            "rank": 11,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 3,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 13,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 0
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 11,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 4,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 9,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 2
+        }
+      ],
+      "winner_id": 0
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 12,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 3,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 10,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 2
+        }
+      ],
+      "winner_id": 0
+    }
+  ],
+  "trick_index": 10,
+  "tricks_taken_so_far": {
+    "0": 7,
+    "1": 2,
+    "2": 1
+  },
+  "trump": {
+    "card": {
+      "rank": 3,
+      "suit": "RED",
+      "type": "number"
+    },
+    "suit": "RED"
+  }
+}
+
+Keep any reasoning to a few sentences at most. End with `FINAL_JSON:` followed by ONLY the JSON object; after the `FINAL_JSON:` label, no other text or punctuation should appear after the closing brace.
+
+Observation JSON:
+{
+  "bids": {
+    "0": 4,
+    "1": 2,
+    "2": 1
+  },
+  "current_trick": {
+    "led_suit": "BLUE",
+    "plays": [
+      {
+        "card": {
+          "rank": 6,
+          "suit": "BLUE",
+          "type": "number"
+        },
+        "player_id": 0
+      }
+    ]
+  },
+  "game": {
+    "cards_per_player": 14,
+    "dealer_id": 1,
+    "game_id": "game-54",
+    "num_players": 3,
+    "round_index": 13
+  },
+  "hand": [
+    {
+      "rank": 1,
+      "suit": "BLUE",
+      "type": "number"
+    },
+    {
+      "rank": 6,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 4,
+      "suit": "BLUE",
+      "type": "number"
+    },
+    {
+      "rank": 2,
+      "suit": "BLUE",
+      "type": "number"
+    }
+  ],
+  "hand_sizes": {
+    "0": 3,
+    "1": 4,
+    "2": 4
+  },
+  "leader_id": 0,
+  "legal_move_indices": [
+    0,
+    2,
+    3
+  ],
+  "phase": "play",
+  "player": {
+    "id": 1,
+    "name": "openai:gpt-4o-mini",
+    "score": 20
+  },
+  "player_names": {
+    "0": "anthropic:claude-3-5-haiku-latest",
+    "1": "openai:gpt-4o-mini",
+    "2": "gemini:gemini-2.0-flash"
+  },
+  "scores": {
+    "0": -30,
+    "1": 20,
+    "2": -30
+  },
+  "seating_order": [
+    0,
+    1,
+    2
+  ],
+  "trick_history": [
+    {
+      "led_suit": "YELLOW",
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "jester"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 7,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": "RED",
+      "plays": [
+        {
+          "card": {
+            "rank": 11,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 13,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 0
+    },
+    {
+      "led_suit": "RED",
+      "plays": [
+        {
+          "card": {
+            "rank": 7,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 4,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 1,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 2
+        }
+      ],
+      "winner_id": 0
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 8,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 5,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 6,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 2
+        }
+      ],
+      "winner_id": 0
+    },
+    {
+      "led_suit": "YELLOW",
+      "plays": [
+        {
+          "card": {
+            "rank": 5,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 13,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 2
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "YELLOW",
+      "plays": [
+        {
+          "card": {
+            "rank": 2,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 12,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 10,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 0
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 1,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 13,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 7,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 2
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": "BLUE",
+      "plays": [
+        {
+          "card": {
+            "rank": 11,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 3,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 13,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 0
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 11,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 4,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 9,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 2
+        }
+      ],
+      "winner_id": 0
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 12,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 3,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 10,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 2
+        }
+      ],
+      "winner_id": 0
+    }
+  ],
+  "trick_index": 10,
+  "tricks_taken_so_far": {
+    "0": 7,
+    "1": 2,
+    "2": 1
+  },
+  "trump": {
+    "card": {
+      "rank": 3,
+      "suit": "RED",
+      "type": "number"
+    },
+    "suit": "RED"
+  }
+}
+
+=== Agent: openai:gpt-4o-mini | Purpose: choose_card | Game: game-56 | Round: 13 | Phase: play ===
+Error: LLM API failure after 5 attempts: Error code: 429 - {'error': {'message': 'Rate limit reached for gpt-4o-mini in organization org-Eo76H3MXPiEhUOlI7o1YBPZb on requests per day (RPD): Limit 10000, Used 10000, Requested 1. Please try again in 8.64s. Visit https://platform.openai.com/account/rate-limits to learn more.', 'type': 'requests', 'param': None, 'code': 'rate_limit_exceeded'}}
+
+Prompt:
+You are playing the trick-taking card game Wizard. You must respect the game rules at all times.
+
+Essentials:
+- 60-card deck: suits RED/BLUE/GREEN/YELLOW (number cards 1–13), plus 4 WIZARD and 4 JESTER cards (no suit).
+- Trump: if the face-up card is a NUMBER, its suit is trump; if it is a JESTER, there is NO TRUMP; if it is a WIZARD, the dealer chooses any trump suit; in the last round there is NO TRUMP.
+- Trick lead: the first NUMBER card played in a trick sets the led suit, unless the trick is led with a WIZARD (no led suit is set).
+- If you have any NUMBER cards in the led suit you must play one of them, except that you may always play a WIZARD or JESTER instead.
+- If there is no led suit yet (for example because the trick was led with a WIZARD or JESTER and no NUMBER has been played), any card is legal.
+- Trick winner: if any WIZARD is played, the earliest WIZARD wins; otherwise, if there is a trump suit, the highest NUMBER in the trump suit wins; otherwise, the highest NUMBER in the led suit wins; if all cards are JESTERs, the earliest JESTER wins.
+- Card indices in your hand are 0-indexed; you may only choose an index from `legal_move_indices` when playing a card.
+- Objective: by the end of the round, win exactly the number of tricks you bid (no more and no less).
+- Scoring: if tricks_won == bid then your score change is +20 + 10 * bid; otherwise your score change is -10 * abs(tricks_won - bid). Total score is cumulative across rounds.
+- Information: you see only your own hand plus public data (trump, bids, tricks, scores). The environment has already computed `legal_move_indices` for valid plays.
+
+Follow the Wizard rules above exactly. They are fixed for this entire game and do not change between turns.
+
+Quick state digest (for fast reference; use the JSON below for full details):
+
+Player 1 bid: 3; tricks_won: 9; Trump: GREEN; Current trick leader: 0; Cards in hand: 3; Legal moves: [0, 1, 2] -> 0: YELLOW 7, 1: RED 8, 2: RED 6
+
+Pick exactly one integer index from the `legal_move_indices` list in the observation. Card indices are 0-indexed within your current hand.
+Hand with indices: 0: YELLOW 7, 1: RED 8, 2: RED 6
+Legal move options (index -> card): 0: YELLOW 7, 1: RED 8, 2: RED 6
+Scoring reminder: if tricks_won == bid your score goes up by 20 + 10 * bid; otherwise your score decreases by 10 * abs(tricks_won - bid).
+If you include a rationale, keep it short, then end with FINAL_JSON: {"card_index": <integer>} with nothing after the closing brace.
+
+Here is a JSON description of the current game state from your perspective:
+
+{
+  "bids": {
+    "0": 3,
+    "1": 3,
+    "2": 1
+  },
+  "current_trick": {
+    "led_suit": "BLUE",
+    "plays": [
+      {
+        "card": {
+          "rank": 9,
+          "suit": "BLUE",
+          "type": "number"
+        },
+        "player_id": 0
+      }
+    ]
+  },
+  "game": {
+    "cards_per_player": 14,
+    "dealer_id": 1,
+    "game_id": "game-56",
+    "num_players": 3,
+    "round_index": 13
+  },
+  "hand": [
+    {
+      "rank": 7,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 8,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 6,
+      "suit": "RED",
+      "type": "number"
+    }
+  ],
+  "hand_sizes": {
+    "0": 2,
+    "1": 3,
+    "2": 3
+  },
+  "leader_id": 0,
+  "legal_move_indices": [
+    0,
+    1,
+    2
+  ],
+  "phase": "play",
+  "player": {
+    "id": 1,
+    "name": "openai:gpt-4o-mini",
+    "score": -70
+  },
+  "player_names": {
+    "0": "anthropic:claude-3-5-haiku-latest",
+    "1": "openai:gpt-4o-mini",
+    "2": "gemini:gemini-2.0-flash"
+  },
+  "scores": {
+    "0": 100,
+    "1": -70,
+    "2": -70
+  },
+  "seating_order": [
+    0,
+    1,
+    2
+  ],
+  "trick_history": [
+    {
+      "led_suit": "BLUE",
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "jester"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 8,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 12,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": null,
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "jester"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 6,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": null,
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 5,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 7,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 13,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 1,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "jester"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 12,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 12,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "YELLOW",
+      "plays": [
+        {
+          "card": {
+            "rank": 5,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 3,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 11,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 11,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 10,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 2,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 8,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 1,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 9,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 6,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 12,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 10,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 5,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 1,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 3,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": "BLUE",
+      "plays": [
+        {
+          "card": {
+            "rank": 2,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 3,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 4,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 0
+    }
+  ],
+  "trick_index": 11,
+  "tricks_taken_so_far": {
+    "0": 1,
+    "1": 9,
+    "2": 1
+  },
+  "trump": {
+    "card": {
+      "rank": 4,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    "suit": "GREEN"
+  }
+}
+
+Keep any reasoning to a few sentences at most. End with `FINAL_JSON:` followed by ONLY the JSON object; after the `FINAL_JSON:` label, no other text or punctuation should appear after the closing brace.
+
+Observation JSON:
+{
+  "bids": {
+    "0": 3,
+    "1": 3,
+    "2": 1
+  },
+  "current_trick": {
+    "led_suit": "BLUE",
+    "plays": [
+      {
+        "card": {
+          "rank": 9,
+          "suit": "BLUE",
+          "type": "number"
+        },
+        "player_id": 0
+      }
+    ]
+  },
+  "game": {
+    "cards_per_player": 14,
+    "dealer_id": 1,
+    "game_id": "game-56",
+    "num_players": 3,
+    "round_index": 13
+  },
+  "hand": [
+    {
+      "rank": 7,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 8,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 6,
+      "suit": "RED",
+      "type": "number"
+    }
+  ],
+  "hand_sizes": {
+    "0": 2,
+    "1": 3,
+    "2": 3
+  },
+  "leader_id": 0,
+  "legal_move_indices": [
+    0,
+    1,
+    2
+  ],
+  "phase": "play",
+  "player": {
+    "id": 1,
+    "name": "openai:gpt-4o-mini",
+    "score": -70
+  },
+  "player_names": {
+    "0": "anthropic:claude-3-5-haiku-latest",
+    "1": "openai:gpt-4o-mini",
+    "2": "gemini:gemini-2.0-flash"
+  },
+  "scores": {
+    "0": 100,
+    "1": -70,
+    "2": -70
+  },
+  "seating_order": [
+    0,
+    1,
+    2
+  ],
+  "trick_history": [
+    {
+      "led_suit": "BLUE",
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "jester"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 8,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 12,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": null,
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "jester"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 6,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": null,
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 5,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 7,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 13,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 1,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "jester"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 12,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 12,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "YELLOW",
+      "plays": [
+        {
+          "card": {
+            "rank": 5,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 3,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 11,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 11,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 10,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 2,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 8,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 1,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 9,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 6,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 12,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 10,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 5,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 1,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 3,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": "BLUE",
+      "plays": [
+        {
+          "card": {
+            "rank": 2,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 3,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 4,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 0
+    }
+  ],
+  "trick_index": 11,
+  "tricks_taken_so_far": {
+    "0": 1,
+    "1": 9,
+    "2": 1
+  },
+  "trump": {
+    "card": {
+      "rank": 4,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    "suit": "GREEN"
+  }
+}
+
+=== Agent: openai:gpt-4o-mini | Purpose: choose_card | Game: game-48 | Round: 13 | Phase: play ===
+Error: LLM API failure after 5 attempts: Error code: 429 - {'error': {'message': 'Rate limit reached for gpt-4o-mini in organization org-Eo76H3MXPiEhUOlI7o1YBPZb on requests per day (RPD): Limit 10000, Used 10000, Requested 1. Please try again in 8.64s. Visit https://platform.openai.com/account/rate-limits to learn more.', 'type': 'requests', 'param': None, 'code': 'rate_limit_exceeded'}}
+
+Prompt:
+You are playing the trick-taking card game Wizard. You must respect the game rules at all times.
+
+Essentials:
+- 60-card deck: suits RED/BLUE/GREEN/YELLOW (number cards 1–13), plus 4 WIZARD and 4 JESTER cards (no suit).
+- Trump: if the face-up card is a NUMBER, its suit is trump; if it is a JESTER, there is NO TRUMP; if it is a WIZARD, the dealer chooses any trump suit; in the last round there is NO TRUMP.
+- Trick lead: the first NUMBER card played in a trick sets the led suit, unless the trick is led with a WIZARD (no led suit is set).
+- If you have any NUMBER cards in the led suit you must play one of them, except that you may always play a WIZARD or JESTER instead.
+- If there is no led suit yet (for example because the trick was led with a WIZARD or JESTER and no NUMBER has been played), any card is legal.
+- Trick winner: if any WIZARD is played, the earliest WIZARD wins; otherwise, if there is a trump suit, the highest NUMBER in the trump suit wins; otherwise, the highest NUMBER in the led suit wins; if all cards are JESTERs, the earliest JESTER wins.
+- Card indices in your hand are 0-indexed; you may only choose an index from `legal_move_indices` when playing a card.
+- Objective: by the end of the round, win exactly the number of tricks you bid (no more and no less).
+- Scoring: if tricks_won == bid then your score change is +20 + 10 * bid; otherwise your score change is -10 * abs(tricks_won - bid). Total score is cumulative across rounds.
+- Information: you see only your own hand plus public data (trump, bids, tricks, scores). The environment has already computed `legal_move_indices` for valid plays.
+
+Follow the Wizard rules above exactly. They are fixed for this entire game and do not change between turns.
+
+Quick state digest (for fast reference; use the JSON below for full details):
+
+Player 0 bid: 5; tricks_won: 1; Trump: BLUE; Current trick leader: 0; Cards in hand: 13; Legal moves: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] -> 0: WIZARD, 1: YELLOW 8, 2: RED 1, 3: GREEN 5, 4: JESTER, 5: RED 9, 6: BLUE 10, 7: GREEN 10, 8: RED 11, 9: BLUE 5, 10: BLUE 4, 11: GREEN 9, 12: BLUE 9
+
+Pick exactly one integer index from the `legal_move_indices` list in the observation. Card indices are 0-indexed within your current hand.
+Hand with indices: 0: WIZARD, 1: YELLOW 8, 2: RED 1, 3: GREEN 5, 4: JESTER, 5: RED 9, 6: BLUE 10, 7: GREEN 10, 8: RED 11, 9: BLUE 5, 10: BLUE 4, 11: GREEN 9, 12: BLUE 9
+Legal move options (index -> card): 0: WIZARD, 1: YELLOW 8, 2: RED 1, 3: GREEN 5, 4: JESTER, 5: RED 9, 6: BLUE 10, 7: GREEN 10, 8: RED 11, 9: BLUE 5, 10: BLUE 4, 11: GREEN 9, 12: BLUE 9
+Scoring reminder: if tricks_won == bid your score goes up by 20 + 10 * bid; otherwise your score decreases by 10 * abs(tricks_won - bid).
+If you include a rationale, keep it short, then end with FINAL_JSON: {"card_index": <integer>} with nothing after the closing brace.
+
+Here is a JSON description of the current game state from your perspective:
+
+{
+  "bids": {
+    "0": 5,
+    "1": 1,
+    "2": 5
+  },
+  "current_trick": {
+    "led_suit": null,
+    "plays": []
+  },
+  "game": {
+    "cards_per_player": 14,
+    "dealer_id": 1,
+    "game_id": "game-48",
+    "num_players": 3,
+    "round_index": 13
+  },
+  "hand": [
+    {
+      "rank": null,
+      "suit": null,
+      "type": "wizard"
+    },
+    {
+      "rank": 8,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 1,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 5,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    {
+      "rank": null,
+      "suit": null,
+      "type": "jester"
+    },
+    {
+      "rank": 9,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 10,
+      "suit": "BLUE",
+      "type": "number"
+    },
+    {
+      "rank": 10,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    {
+      "rank": 11,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 5,
+      "suit": "BLUE",
+      "type": "number"
+    },
+    {
+      "rank": 4,
+      "suit": "BLUE",
+      "type": "number"
+    },
+    {
+      "rank": 9,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    {
+      "rank": 9,
+      "suit": "BLUE",
+      "type": "number"
+    }
+  ],
+  "hand_sizes": {
+    "0": 13,
+    "1": 13,
+    "2": 13
+  },
+  "leader_id": 0,
+  "legal_move_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+  ],
+  "phase": "play",
+  "player": {
+    "id": 0,
+    "name": "openai:gpt-4o-mini",
+    "score": 170
+  },
+  "player_names": {
+    "0": "openai:gpt-4o-mini",
+    "1": "gemini:gemini-2.0-flash",
+    "2": "anthropic:claude-3-5-haiku-latest"
+  },
+  "scores": {
+    "0": 170,
+    "1": -170,
+    "2": 80
+  },
+  "seating_order": [
+    0,
+    1,
+    2
+  ],
+  "trick_history": [
+    {
+      "led_suit": "YELLOW",
+      "plays": [
+        {
+          "card": {
+            "rank": 2,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 12,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "jester"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 0
+    }
+  ],
+  "trick_index": 1,
+  "tricks_taken_so_far": {
+    "0": 1,
+    "1": 0,
+    "2": 0
+  },
+  "trump": {
+    "card": {
+      "rank": 7,
+      "suit": "BLUE",
+      "type": "number"
+    },
+    "suit": "BLUE"
+  }
+}
+
+Keep any reasoning to a few sentences at most. End with `FINAL_JSON:` followed by ONLY the JSON object; after the `FINAL_JSON:` label, no other text or punctuation should appear after the closing brace.
+
+Observation JSON:
+{
+  "bids": {
+    "0": 5,
+    "1": 1,
+    "2": 5
+  },
+  "current_trick": {
+    "led_suit": null,
+    "plays": []
+  },
+  "game": {
+    "cards_per_player": 14,
+    "dealer_id": 1,
+    "game_id": "game-48",
+    "num_players": 3,
+    "round_index": 13
+  },
+  "hand": [
+    {
+      "rank": null,
+      "suit": null,
+      "type": "wizard"
+    },
+    {
+      "rank": 8,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 1,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 5,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    {
+      "rank": null,
+      "suit": null,
+      "type": "jester"
+    },
+    {
+      "rank": 9,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 10,
+      "suit": "BLUE",
+      "type": "number"
+    },
+    {
+      "rank": 10,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    {
+      "rank": 11,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 5,
+      "suit": "BLUE",
+      "type": "number"
+    },
+    {
+      "rank": 4,
+      "suit": "BLUE",
+      "type": "number"
+    },
+    {
+      "rank": 9,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    {
+      "rank": 9,
+      "suit": "BLUE",
+      "type": "number"
+    }
+  ],
+  "hand_sizes": {
+    "0": 13,
+    "1": 13,
+    "2": 13
+  },
+  "leader_id": 0,
+  "legal_move_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+  ],
+  "phase": "play",
+  "player": {
+    "id": 0,
+    "name": "openai:gpt-4o-mini",
+    "score": 170
+  },
+  "player_names": {
+    "0": "openai:gpt-4o-mini",
+    "1": "gemini:gemini-2.0-flash",
+    "2": "anthropic:claude-3-5-haiku-latest"
+  },
+  "scores": {
+    "0": 170,
+    "1": -170,
+    "2": 80
+  },
+  "seating_order": [
+    0,
+    1,
+    2
+  ],
+  "trick_history": [
+    {
+      "led_suit": "YELLOW",
+      "plays": [
+        {
+          "card": {
+            "rank": 2,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 12,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "jester"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 0
+    }
+  ],
+  "trick_index": 1,
+  "tricks_taken_so_far": {
+    "0": 1,
+    "1": 0,
+    "2": 0
+  },
+  "trump": {
+    "card": {
+      "rank": 7,
+      "suit": "BLUE",
+      "type": "number"
+    },
+    "suit": "BLUE"
+  }
+}
+
+=== Agent: openai:gpt-4o-mini | Purpose: choose_card | Game: game-49 | Round: 13 | Phase: play ===
+Error: LLM API failure after 5 attempts: Error code: 429 - {'error': {'message': 'Rate limit reached for gpt-4o-mini in organization org-Eo76H3MXPiEhUOlI7o1YBPZb on requests per day (RPD): Limit 10000, Used 10000, Requested 1. Please try again in 8.64s. Visit https://platform.openai.com/account/rate-limits to learn more.', 'type': 'requests', 'param': None, 'code': 'rate_limit_exceeded'}}
+
+Prompt:
+You are playing the trick-taking card game Wizard. You must respect the game rules at all times.
+
+Essentials:
+- 60-card deck: suits RED/BLUE/GREEN/YELLOW (number cards 1–13), plus 4 WIZARD and 4 JESTER cards (no suit).
+- Trump: if the face-up card is a NUMBER, its suit is trump; if it is a JESTER, there is NO TRUMP; if it is a WIZARD, the dealer chooses any trump suit; in the last round there is NO TRUMP.
+- Trick lead: the first NUMBER card played in a trick sets the led suit, unless the trick is led with a WIZARD (no led suit is set).
+- If you have any NUMBER cards in the led suit you must play one of them, except that you may always play a WIZARD or JESTER instead.
+- If there is no led suit yet (for example because the trick was led with a WIZARD or JESTER and no NUMBER has been played), any card is legal.
+- Trick winner: if any WIZARD is played, the earliest WIZARD wins; otherwise, if there is a trump suit, the highest NUMBER in the trump suit wins; otherwise, the highest NUMBER in the led suit wins; if all cards are JESTERs, the earliest JESTER wins.
+- Card indices in your hand are 0-indexed; you may only choose an index from `legal_move_indices` when playing a card.
+- Objective: by the end of the round, win exactly the number of tricks you bid (no more and no less).
+- Scoring: if tricks_won == bid then your score change is +20 + 10 * bid; otherwise your score change is -10 * abs(tricks_won - bid). Total score is cumulative across rounds.
+- Information: you see only your own hand plus public data (trump, bids, tricks, scores). The environment has already computed `legal_move_indices` for valid plays.
+
+Follow the Wizard rules above exactly. They are fixed for this entire game and do not change between turns.
+
+Quick state digest (for fast reference; use the JSON below for full details):
+
+Player 2 bid: 3; tricks_won: 7; Trump: GREEN; Current trick leader: 0; Cards in hand: 1; Legal moves: [0] -> 0: RED 5
+
+Pick exactly one integer index from the `legal_move_indices` list in the observation. Card indices are 0-indexed within your current hand.
+Hand with indices: 0: RED 5
+Legal move options (index -> card): 0: RED 5
+Scoring reminder: if tricks_won == bid your score goes up by 20 + 10 * bid; otherwise your score decreases by 10 * abs(tricks_won - bid).
+If you include a rationale, keep it short, then end with FINAL_JSON: {"card_index": <integer>} with nothing after the closing brace.
+
+Here is a JSON description of the current game state from your perspective:
+
+{
+  "bids": {
+    "0": 4,
+    "1": 3,
+    "2": 3
+  },
+  "current_trick": {
+    "led_suit": "YELLOW",
+    "plays": [
+      {
+        "card": {
+          "rank": 6,
+          "suit": "YELLOW",
+          "type": "number"
+        },
+        "player_id": 0
+      },
+      {
+        "card": {
+          "rank": 13,
+          "suit": "BLUE",
+          "type": "number"
+        },
+        "player_id": 1
+      }
+    ]
+  },
+  "game": {
+    "cards_per_player": 14,
+    "dealer_id": 1,
+    "game_id": "game-49",
+    "num_players": 3,
+    "round_index": 13
+  },
+  "hand": [
+    {
+      "rank": 5,
+      "suit": "RED",
+      "type": "number"
+    }
+  ],
+  "hand_sizes": {
+    "0": 0,
+    "1": 0,
+    "2": 1
+  },
+  "leader_id": 0,
+  "legal_move_indices": [
+    0
+  ],
+  "phase": "play",
+  "player": {
+    "id": 2,
+    "name": "openai:gpt-4o-mini",
+    "score": -80
+  },
+  "player_names": {
+    "0": "anthropic:claude-3-5-haiku-latest",
+    "1": "gemini:gemini-2.0-flash",
+    "2": "openai:gpt-4o-mini"
+  },
+  "scores": {
+    "0": -20,
+    "1": -140,
+    "2": -80
+  },
+  "seating_order": [
+    0,
+    1,
+    2
+  ],
+  "trick_history": [
+    {
+      "led_suit": null,
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 3,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 4,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": null,
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "jester"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 6,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": null,
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 2,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 12,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 9,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 13,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": "BLUE",
+      "plays": [
+        {
+          "card": {
+            "rank": 1,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 11,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 7,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 8,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 2,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 5,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "RED",
+      "plays": [
+        {
+          "card": {
+            "rank": 10,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 2,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 7,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 7,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 3,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 7,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "RED",
+      "plays": [
+        {
+          "card": {
+            "rank": 9,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 12,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 8,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 0
+    },
+    {
+      "led_suit": "YELLOW",
+      "plays": [
+        {
+          "card": {
+            "rank": 1,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 9,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 8,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 2
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": "BLUE",
+      "plays": [
+        {
+          "card": {
+            "rank": 10,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 6,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 5,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": "YELLOW",
+      "plays": [
+        {
+          "card": {
+            "rank": 11,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 4,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 13,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 0
+    },
+    {
+      "led_suit": "RED",
+      "plays": [
+        {
+          "card": {
+            "rank": 3,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 12,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 1,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 2
+        }
+      ],
+      "winner_id": 0
+    }
+  ],
+  "trick_index": 13,
+  "tricks_taken_so_far": {
+    "0": 3,
+    "1": 3,
+    "2": 7
+  },
+  "trump": {
+    "card": {
+      "rank": 11,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    "suit": "GREEN"
+  }
+}
+
+Keep any reasoning to a few sentences at most. End with `FINAL_JSON:` followed by ONLY the JSON object; after the `FINAL_JSON:` label, no other text or punctuation should appear after the closing brace.
+
+Observation JSON:
+{
+  "bids": {
+    "0": 4,
+    "1": 3,
+    "2": 3
+  },
+  "current_trick": {
+    "led_suit": "YELLOW",
+    "plays": [
+      {
+        "card": {
+          "rank": 6,
+          "suit": "YELLOW",
+          "type": "number"
+        },
+        "player_id": 0
+      },
+      {
+        "card": {
+          "rank": 13,
+          "suit": "BLUE",
+          "type": "number"
+        },
+        "player_id": 1
+      }
+    ]
+  },
+  "game": {
+    "cards_per_player": 14,
+    "dealer_id": 1,
+    "game_id": "game-49",
+    "num_players": 3,
+    "round_index": 13
+  },
+  "hand": [
+    {
+      "rank": 5,
+      "suit": "RED",
+      "type": "number"
+    }
+  ],
+  "hand_sizes": {
+    "0": 0,
+    "1": 0,
+    "2": 1
+  },
+  "leader_id": 0,
+  "legal_move_indices": [
+    0
+  ],
+  "phase": "play",
+  "player": {
+    "id": 2,
+    "name": "openai:gpt-4o-mini",
+    "score": -80
+  },
+  "player_names": {
+    "0": "anthropic:claude-3-5-haiku-latest",
+    "1": "gemini:gemini-2.0-flash",
+    "2": "openai:gpt-4o-mini"
+  },
+  "scores": {
+    "0": -20,
+    "1": -140,
+    "2": -80
+  },
+  "seating_order": [
+    0,
+    1,
+    2
+  ],
+  "trick_history": [
+    {
+      "led_suit": null,
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 3,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 4,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": null,
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "jester"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 6,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": null,
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 2,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 12,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 9,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 13,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": "BLUE",
+      "plays": [
+        {
+          "card": {
+            "rank": 1,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 11,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 7,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 8,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 2,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 5,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "RED",
+      "plays": [
+        {
+          "card": {
+            "rank": 10,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 2,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 7,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 7,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 3,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 7,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "RED",
+      "plays": [
+        {
+          "card": {
+            "rank": 9,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 12,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 8,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 0
+    },
+    {
+      "led_suit": "YELLOW",
+      "plays": [
+        {
+          "card": {
+            "rank": 1,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 9,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 8,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 2
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": "BLUE",
+      "plays": [
+        {
+          "card": {
+            "rank": 10,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 6,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 5,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": "YELLOW",
+      "plays": [
+        {
+          "card": {
+            "rank": 11,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 4,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 13,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 0
+    },
+    {
+      "led_suit": "RED",
+      "plays": [
+        {
+          "card": {
+            "rank": 3,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 12,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 1,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 2
+        }
+      ],
+      "winner_id": 0
+    }
+  ],
+  "trick_index": 13,
+  "tricks_taken_so_far": {
+    "0": 3,
+    "1": 3,
+    "2": 7
+  },
+  "trump": {
+    "card": {
+      "rank": 11,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    "suit": "GREEN"
+  }
+}
+
+=== Agent: openai:gpt-4o-mini | Purpose: choose_card | Game: game-55 | Round: 13 | Phase: play ===
+Error: LLM API failure after 5 attempts: Error code: 429 - {'error': {'message': 'Rate limit reached for gpt-4o-mini in organization org-Eo76H3MXPiEhUOlI7o1YBPZb on requests per day (RPD): Limit 10000, Used 10000, Requested 1. Please try again in 8.64s. Visit https://platform.openai.com/account/rate-limits to learn more.', 'type': 'requests', 'param': None, 'code': 'rate_limit_exceeded'}}
+
+Prompt:
+You are playing the trick-taking card game Wizard. You must respect the game rules at all times.
+
+Essentials:
+- 60-card deck: suits RED/BLUE/GREEN/YELLOW (number cards 1–13), plus 4 WIZARD and 4 JESTER cards (no suit).
+- Trump: if the face-up card is a NUMBER, its suit is trump; if it is a JESTER, there is NO TRUMP; if it is a WIZARD, the dealer chooses any trump suit; in the last round there is NO TRUMP.
+- Trick lead: the first NUMBER card played in a trick sets the led suit, unless the trick is led with a WIZARD (no led suit is set).
+- If you have any NUMBER cards in the led suit you must play one of them, except that you may always play a WIZARD or JESTER instead.
+- If there is no led suit yet (for example because the trick was led with a WIZARD or JESTER and no NUMBER has been played), any card is legal.
+- Trick winner: if any WIZARD is played, the earliest WIZARD wins; otherwise, if there is a trump suit, the highest NUMBER in the trump suit wins; otherwise, the highest NUMBER in the led suit wins; if all cards are JESTERs, the earliest JESTER wins.
+- Card indices in your hand are 0-indexed; you may only choose an index from `legal_move_indices` when playing a card.
+- Objective: by the end of the round, win exactly the number of tricks you bid (no more and no less).
+- Scoring: if tricks_won == bid then your score change is +20 + 10 * bid; otherwise your score change is -10 * abs(tricks_won - bid). Total score is cumulative across rounds.
+- Information: you see only your own hand plus public data (trump, bids, tricks, scores). The environment has already computed `legal_move_indices` for valid plays.
+
+Follow the Wizard rules above exactly. They are fixed for this entire game and do not change between turns.
+
+Quick state digest (for fast reference; use the JSON below for full details):
+
+Player 2 bid: 2; tricks_won: 2; Trump: BLUE; Current trick leader: 2; Cards in hand: 12; Legal moves: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] -> 0: RED 6, 1: GREEN 2, 2: YELLOW 12, 3: BLUE 3, 4: YELLOW 13, 5: GREEN 9, 6: BLUE 10, 7: RED 5, 8: RED 3, 9: YELLOW 5, 10: WIZARD, 11: GREEN 12
+
+Pick exactly one integer index from the `legal_move_indices` list in the observation. Card indices are 0-indexed within your current hand.
+Hand with indices: 0: RED 6, 1: GREEN 2, 2: YELLOW 12, 3: BLUE 3, 4: YELLOW 13, 5: GREEN 9, 6: BLUE 10, 7: RED 5, 8: RED 3, 9: YELLOW 5, 10: WIZARD, 11: GREEN 12
+Legal move options (index -> card): 0: RED 6, 1: GREEN 2, 2: YELLOW 12, 3: BLUE 3, 4: YELLOW 13, 5: GREEN 9, 6: BLUE 10, 7: RED 5, 8: RED 3, 9: YELLOW 5, 10: WIZARD, 11: GREEN 12
+Scoring reminder: if tricks_won == bid your score goes up by 20 + 10 * bid; otherwise your score decreases by 10 * abs(tricks_won - bid).
+If you include a rationale, keep it short, then end with FINAL_JSON: {"card_index": <integer>} with nothing after the closing brace.
+
+Here is a JSON description of the current game state from your perspective:
+
+{
+  "bids": {
+    "0": 0,
+    "1": 3,
+    "2": 2
+  },
+  "current_trick": {
+    "led_suit": null,
+    "plays": []
+  },
+  "game": {
+    "cards_per_player": 14,
+    "dealer_id": 1,
+    "game_id": "game-55",
+    "num_players": 3,
+    "round_index": 13
+  },
+  "hand": [
+    {
+      "rank": 6,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 2,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    {
+      "rank": 12,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 3,
+      "suit": "BLUE",
+      "type": "number"
+    },
+    {
+      "rank": 13,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 9,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    {
+      "rank": 10,
+      "suit": "BLUE",
+      "type": "number"
+    },
+    {
+      "rank": 5,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 3,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 5,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": null,
+      "suit": null,
+      "type": "wizard"
+    },
+    {
+      "rank": 12,
+      "suit": "GREEN",
+      "type": "number"
+    }
+  ],
+  "hand_sizes": {
+    "0": 12,
+    "1": 12,
+    "2": 12
+  },
+  "leader_id": 2,
+  "legal_move_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11
+  ],
+  "phase": "play",
+  "player": {
+    "id": 2,
+    "name": "openai:gpt-4o-mini",
+    "score": 30
+  },
+  "player_names": {
+    "0": "gemini:gemini-2.0-flash",
+    "1": "anthropic:claude-3-5-haiku-latest",
+    "2": "openai:gpt-4o-mini"
+  },
+  "scores": {
+    "0": -80,
+    "1": -20,
+    "2": 30
+  },
+  "seating_order": [
+    0,
+    1,
+    2
+  ],
+  "trick_history": [
+    {
+      "led_suit": null,
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "jester"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": null,
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 13,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 1,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    }
+  ],
+  "trick_index": 2,
+  "tricks_taken_so_far": {
+    "0": 0,
+    "1": 0,
+    "2": 2
+  },
+  "trump": {
+    "card": {
+      "rank": 12,
+      "suit": "BLUE",
+      "type": "number"
+    },
+    "suit": "BLUE"
+  }
+}
+
+Keep any reasoning to a few sentences at most. End with `FINAL_JSON:` followed by ONLY the JSON object; after the `FINAL_JSON:` label, no other text or punctuation should appear after the closing brace.
+
+Observation JSON:
+{
+  "bids": {
+    "0": 0,
+    "1": 3,
+    "2": 2
+  },
+  "current_trick": {
+    "led_suit": null,
+    "plays": []
+  },
+  "game": {
+    "cards_per_player": 14,
+    "dealer_id": 1,
+    "game_id": "game-55",
+    "num_players": 3,
+    "round_index": 13
+  },
+  "hand": [
+    {
+      "rank": 6,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 2,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    {
+      "rank": 12,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 3,
+      "suit": "BLUE",
+      "type": "number"
+    },
+    {
+      "rank": 13,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 9,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    {
+      "rank": 10,
+      "suit": "BLUE",
+      "type": "number"
+    },
+    {
+      "rank": 5,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 3,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 5,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": null,
+      "suit": null,
+      "type": "wizard"
+    },
+    {
+      "rank": 12,
+      "suit": "GREEN",
+      "type": "number"
+    }
+  ],
+  "hand_sizes": {
+    "0": 12,
+    "1": 12,
+    "2": 12
+  },
+  "leader_id": 2,
+  "legal_move_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11
+  ],
+  "phase": "play",
+  "player": {
+    "id": 2,
+    "name": "openai:gpt-4o-mini",
+    "score": 30
+  },
+  "player_names": {
+    "0": "gemini:gemini-2.0-flash",
+    "1": "anthropic:claude-3-5-haiku-latest",
+    "2": "openai:gpt-4o-mini"
+  },
+  "scores": {
+    "0": -80,
+    "1": -20,
+    "2": 30
+  },
+  "seating_order": [
+    0,
+    1,
+    2
+  ],
+  "trick_history": [
+    {
+      "led_suit": null,
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "jester"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": null,
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 13,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 1,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    }
+  ],
+  "trick_index": 2,
+  "tricks_taken_so_far": {
+    "0": 0,
+    "1": 0,
+    "2": 2
+  },
+  "trump": {
+    "card": {
+      "rank": 12,
+      "suit": "BLUE",
+      "type": "number"
+    },
+    "suit": "BLUE"
+  }
+}
+
+=== Agent: openai:gpt-4o-mini | Purpose: choose_card | Game: game-51 | Round: 12 | Phase: play ===
+Error: LLM API failure after 5 attempts: Error code: 429 - {'error': {'message': 'Rate limit reached for gpt-4o-mini in organization org-Eo76H3MXPiEhUOlI7o1YBPZb on requests per day (RPD): Limit 10000, Used 10000, Requested 1. Please try again in 8.64s. Visit https://platform.openai.com/account/rate-limits to learn more.', 'type': 'requests', 'param': None, 'code': 'rate_limit_exceeded'}}
+
+Prompt:
+You are playing the trick-taking card game Wizard. You must respect the game rules at all times.
+
+Essentials:
+- 60-card deck: suits RED/BLUE/GREEN/YELLOW (number cards 1–13), plus 4 WIZARD and 4 JESTER cards (no suit).
+- Trump: if the face-up card is a NUMBER, its suit is trump; if it is a JESTER, there is NO TRUMP; if it is a WIZARD, the dealer chooses any trump suit; in the last round there is NO TRUMP.
+- Trick lead: the first NUMBER card played in a trick sets the led suit, unless the trick is led with a WIZARD (no led suit is set).
+- If you have any NUMBER cards in the led suit you must play one of them, except that you may always play a WIZARD or JESTER instead.
+- If there is no led suit yet (for example because the trick was led with a WIZARD or JESTER and no NUMBER has been played), any card is legal.
+- Trick winner: if any WIZARD is played, the earliest WIZARD wins; otherwise, if there is a trump suit, the highest NUMBER in the trump suit wins; otherwise, the highest NUMBER in the led suit wins; if all cards are JESTERs, the earliest JESTER wins.
+- Card indices in your hand are 0-indexed; you may only choose an index from `legal_move_indices` when playing a card.
+- Objective: by the end of the round, win exactly the number of tricks you bid (no more and no less).
+- Scoring: if tricks_won == bid then your score change is +20 + 10 * bid; otherwise your score change is -10 * abs(tricks_won - bid). Total score is cumulative across rounds.
+- Information: you see only your own hand plus public data (trump, bids, tricks, scores). The environment has already computed `legal_move_indices` for valid plays.
+
+Follow the Wizard rules above exactly. They are fixed for this entire game and do not change between turns.
+
+Quick state digest (for fast reference; use the JSON below for full details):
+
+Player 1 bid: 3; tricks_won: 1; Trump: YELLOW; Current trick leader: 0; Cards in hand: 11; Legal moves: [1, 4, 5, 8] -> 1: GREEN 4, 4: GREEN 12, 5: GREEN 1, 8: GREEN 6
+
+Pick exactly one integer index from the `legal_move_indices` list in the observation. Card indices are 0-indexed within your current hand.
+Hand with indices: 0: YELLOW 4, 1: GREEN 4, 2: BLUE 12, 3: RED 7, 4: GREEN 12, 5: GREEN 1, 6: YELLOW 7, 7: RED 1, 8: GREEN 6, 9: RED 11, 10: RED 10
+Legal move options (index -> card): 1: GREEN 4, 4: GREEN 12, 5: GREEN 1, 8: GREEN 6
+Scoring reminder: if tricks_won == bid your score goes up by 20 + 10 * bid; otherwise your score decreases by 10 * abs(tricks_won - bid).
+If you include a rationale, keep it short, then end with FINAL_JSON: {"card_index": <integer>} with nothing after the closing brace.
+
+Here is a JSON description of the current game state from your perspective:
+
+{
+  "bids": {
+    "0": 4,
+    "1": 3,
+    "2": 3
+  },
+  "current_trick": {
+    "led_suit": "GREEN",
+    "plays": [
+      {
+        "card": {
+          "rank": 5,
+          "suit": "GREEN",
+          "type": "number"
+        },
+        "player_id": 0
+      }
+    ]
+  },
+  "game": {
+    "cards_per_player": 13,
+    "dealer_id": 0,
+    "game_id": "game-51",
+    "num_players": 3,
+    "round_index": 12
+  },
+  "hand": [
+    {
+      "rank": 4,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 4,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    {
+      "rank": 12,
+      "suit": "BLUE",
+      "type": "number"
+    },
+    {
+      "rank": 7,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 12,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    {
+      "rank": 1,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    {
+      "rank": 7,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 1,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 6,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    {
+      "rank": 11,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 10,
+      "suit": "RED",
+      "type": "number"
+    }
+  ],
+  "hand_sizes": {
+    "0": 10,
+    "1": 11,
+    "2": 11
+  },
+  "leader_id": 0,
+  "legal_move_indices": [
+    1,
+    4,
+    5,
+    8
+  ],
+  "phase": "play",
+  "player": {
+    "id": 1,
+    "name": "openai:gpt-4o-mini",
+    "score": 80
+  },
+  "player_names": {
+    "0": "anthropic:claude-3-5-haiku-latest",
+    "1": "openai:gpt-4o-mini",
+    "2": "gemini:gemini-2.0-flash"
+  },
+  "scores": {
+    "0": -20,
+    "1": 80,
+    "2": -100
+  },
+  "seating_order": [
+    0,
+    1,
+    2
+  ],
+  "trick_history": [
+    {
+      "led_suit": null,
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 1,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 10,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": "YELLOW",
+      "plays": [
+        {
+          "card": {
+            "rank": 10,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 3,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 12,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 0
+    }
+  ],
+  "trick_index": 2,
+  "tricks_taken_so_far": {
+    "0": 1,
+    "1": 1,
+    "2": 0
+  },
+  "trump": {
+    "card": {
+      "rank": 11,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    "suit": "YELLOW"
+  }
+}
+
+Keep any reasoning to a few sentences at most. End with `FINAL_JSON:` followed by ONLY the JSON object; after the `FINAL_JSON:` label, no other text or punctuation should appear after the closing brace.
+
+Observation JSON:
+{
+  "bids": {
+    "0": 4,
+    "1": 3,
+    "2": 3
+  },
+  "current_trick": {
+    "led_suit": "GREEN",
+    "plays": [
+      {
+        "card": {
+          "rank": 5,
+          "suit": "GREEN",
+          "type": "number"
+        },
+        "player_id": 0
+      }
+    ]
+  },
+  "game": {
+    "cards_per_player": 13,
+    "dealer_id": 0,
+    "game_id": "game-51",
+    "num_players": 3,
+    "round_index": 12
+  },
+  "hand": [
+    {
+      "rank": 4,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 4,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    {
+      "rank": 12,
+      "suit": "BLUE",
+      "type": "number"
+    },
+    {
+      "rank": 7,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 12,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    {
+      "rank": 1,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    {
+      "rank": 7,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 1,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 6,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    {
+      "rank": 11,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 10,
+      "suit": "RED",
+      "type": "number"
+    }
+  ],
+  "hand_sizes": {
+    "0": 10,
+    "1": 11,
+    "2": 11
+  },
+  "leader_id": 0,
+  "legal_move_indices": [
+    1,
+    4,
+    5,
+    8
+  ],
+  "phase": "play",
+  "player": {
+    "id": 1,
+    "name": "openai:gpt-4o-mini",
+    "score": 80
+  },
+  "player_names": {
+    "0": "anthropic:claude-3-5-haiku-latest",
+    "1": "openai:gpt-4o-mini",
+    "2": "gemini:gemini-2.0-flash"
+  },
+  "scores": {
+    "0": -20,
+    "1": 80,
+    "2": -100
+  },
+  "seating_order": [
+    0,
+    1,
+    2
+  ],
+  "trick_history": [
+    {
+      "led_suit": null,
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 1,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 10,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": "YELLOW",
+      "plays": [
+        {
+          "card": {
+            "rank": 10,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 3,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 12,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 0
+    }
+  ],
+  "trick_index": 2,
+  "tricks_taken_so_far": {
+    "0": 1,
+    "1": 1,
+    "2": 0
+  },
+  "trump": {
+    "card": {
+      "rank": 11,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    "suit": "YELLOW"
+  }
+}
+
+=== Agent: openai:gpt-4o-mini | Purpose: choose_card | Game: game-50 | Round: 12 | Phase: play ===
+Error: LLM API failure after 5 attempts: Error code: 429 - {'error': {'message': 'Rate limit reached for gpt-4o-mini in organization org-Eo76H3MXPiEhUOlI7o1YBPZb on requests per day (RPD): Limit 10000, Used 10000, Requested 1. Please try again in 8.64s. Visit https://platform.openai.com/account/rate-limits to learn more.', 'type': 'requests', 'param': None, 'code': 'rate_limit_exceeded'}}
+
+Prompt:
+You are playing the trick-taking card game Wizard. You must respect the game rules at all times.
+
+Essentials:
+- 60-card deck: suits RED/BLUE/GREEN/YELLOW (number cards 1–13), plus 4 WIZARD and 4 JESTER cards (no suit).
+- Trump: if the face-up card is a NUMBER, its suit is trump; if it is a JESTER, there is NO TRUMP; if it is a WIZARD, the dealer chooses any trump suit; in the last round there is NO TRUMP.
+- Trick lead: the first NUMBER card played in a trick sets the led suit, unless the trick is led with a WIZARD (no led suit is set).
+- If you have any NUMBER cards in the led suit you must play one of them, except that you may always play a WIZARD or JESTER instead.
+- If there is no led suit yet (for example because the trick was led with a WIZARD or JESTER and no NUMBER has been played), any card is legal.
+- Trick winner: if any WIZARD is played, the earliest WIZARD wins; otherwise, if there is a trump suit, the highest NUMBER in the trump suit wins; otherwise, the highest NUMBER in the led suit wins; if all cards are JESTERs, the earliest JESTER wins.
+- Card indices in your hand are 0-indexed; you may only choose an index from `legal_move_indices` when playing a card.
+- Objective: by the end of the round, win exactly the number of tricks you bid (no more and no less).
+- Scoring: if tricks_won == bid then your score change is +20 + 10 * bid; otherwise your score change is -10 * abs(tricks_won - bid). Total score is cumulative across rounds.
+- Information: you see only your own hand plus public data (trump, bids, tricks, scores). The environment has already computed `legal_move_indices` for valid plays.
+
+Follow the Wizard rules above exactly. They are fixed for this entire game and do not change between turns.
+
+Quick state digest (for fast reference; use the JSON below for full details):
+
+Player 1 bid: 3; tricks_won: 0; Trump: BLUE; Current trick leader: 1; Cards in hand: 13; Legal moves: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] -> 0: GREEN 9, 1: YELLOW 6, 2: RED 11, 3: BLUE 8, 4: YELLOW 10, 5: GREEN 3, 6: RED 9, 7: GREEN 13, 8: GREEN 2, 9: YELLOW 13, 10: YELLOW 5, 11: YELLOW 2, 12: BLUE 9
+
+Pick exactly one integer index from the `legal_move_indices` list in the observation. Card indices are 0-indexed within your current hand.
+Hand with indices: 0: GREEN 9, 1: YELLOW 6, 2: RED 11, 3: BLUE 8, 4: YELLOW 10, 5: GREEN 3, 6: RED 9, 7: GREEN 13, 8: GREEN 2, 9: YELLOW 13, 10: YELLOW 5, 11: YELLOW 2, 12: BLUE 9
+Legal move options (index -> card): 0: GREEN 9, 1: YELLOW 6, 2: RED 11, 3: BLUE 8, 4: YELLOW 10, 5: GREEN 3, 6: RED 9, 7: GREEN 13, 8: GREEN 2, 9: YELLOW 13, 10: YELLOW 5, 11: YELLOW 2, 12: BLUE 9
+Scoring reminder: if tricks_won == bid your score goes up by 20 + 10 * bid; otherwise your score decreases by 10 * abs(tricks_won - bid).
+If you include a rationale, keep it short, then end with FINAL_JSON: {"card_index": <integer>} with nothing after the closing brace.
+
+Here is a JSON description of the current game state from your perspective:
+
+{
+  "bids": {
+    "0": 2,
+    "1": 3,
+    "2": 2
+  },
+  "current_trick": {
+    "led_suit": null,
+    "plays": []
+  },
+  "game": {
+    "cards_per_player": 13,
+    "dealer_id": 0,
+    "game_id": "game-50",
+    "num_players": 3,
+    "round_index": 12
+  },
+  "hand": [
+    {
+      "rank": 9,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    {
+      "rank": 6,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 11,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 8,
+      "suit": "BLUE",
+      "type": "number"
+    },
+    {
+      "rank": 10,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 3,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    {
+      "rank": 9,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 13,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    {
+      "rank": 2,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    {
+      "rank": 13,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 5,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 2,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 9,
+      "suit": "BLUE",
+      "type": "number"
+    }
+  ],
+  "hand_sizes": {
+    "0": 13,
+    "1": 13,
+    "2": 13
+  },
+  "leader_id": 1,
+  "legal_move_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+  ],
+  "phase": "play",
+  "player": {
+    "id": 1,
+    "name": "openai:gpt-4o-mini",
+    "score": 120
+  },
+  "player_names": {
+    "0": "gemini:gemini-2.0-flash",
+    "1": "openai:gpt-4o-mini",
+    "2": "anthropic:claude-3-5-haiku-latest"
+  },
+  "scores": {
+    "0": -90,
+    "1": 120,
+    "2": 20
+  },
+  "seating_order": [
+    0,
+    1,
+    2
+  ],
+  "trick_history": [],
+  "trick_index": 0,
+  "tricks_taken_so_far": {
+    "0": 0,
+    "1": 0,
+    "2": 0
+  },
+  "trump": {
+    "card": {
+      "rank": null,
+      "suit": null,
+      "type": "wizard"
+    },
+    "suit": "BLUE"
+  }
+}
+
+Keep any reasoning to a few sentences at most. End with `FINAL_JSON:` followed by ONLY the JSON object; after the `FINAL_JSON:` label, no other text or punctuation should appear after the closing brace.
+
+Observation JSON:
+{
+  "bids": {
+    "0": 2,
+    "1": 3,
+    "2": 2
+  },
+  "current_trick": {
+    "led_suit": null,
+    "plays": []
+  },
+  "game": {
+    "cards_per_player": 13,
+    "dealer_id": 0,
+    "game_id": "game-50",
+    "num_players": 3,
+    "round_index": 12
+  },
+  "hand": [
+    {
+      "rank": 9,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    {
+      "rank": 6,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 11,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 8,
+      "suit": "BLUE",
+      "type": "number"
+    },
+    {
+      "rank": 10,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 3,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    {
+      "rank": 9,
+      "suit": "RED",
+      "type": "number"
+    },
+    {
+      "rank": 13,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    {
+      "rank": 2,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    {
+      "rank": 13,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 5,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 2,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 9,
+      "suit": "BLUE",
+      "type": "number"
+    }
+  ],
+  "hand_sizes": {
+    "0": 13,
+    "1": 13,
+    "2": 13
+  },
+  "leader_id": 1,
+  "legal_move_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+  ],
+  "phase": "play",
+  "player": {
+    "id": 1,
+    "name": "openai:gpt-4o-mini",
+    "score": 120
+  },
+  "player_names": {
+    "0": "gemini:gemini-2.0-flash",
+    "1": "openai:gpt-4o-mini",
+    "2": "anthropic:claude-3-5-haiku-latest"
+  },
+  "scores": {
+    "0": -90,
+    "1": 120,
+    "2": 20
+  },
+  "seating_order": [
+    0,
+    1,
+    2
+  ],
+  "trick_history": [],
+  "trick_index": 0,
+  "tricks_taken_so_far": {
+    "0": 0,
+    "1": 0,
+    "2": 0
+  },
+  "trump": {
+    "card": {
+      "rank": null,
+      "suit": null,
+      "type": "wizard"
+    },
+    "suit": "BLUE"
+  }
+}
+
+=== Agent: openai:gpt-4o-mini | Purpose: choose_card | Game: game-59 | Round: 17 | Phase: play ===
+Error: LLM API failure after 5 attempts: Error code: 429 - {'error': {'message': 'Rate limit reached for gpt-4o-mini in organization org-Eo76H3MXPiEhUOlI7o1YBPZb on requests per day (RPD): Limit 10000, Used 10000, Requested 1. Please try again in 8.64s. Visit https://platform.openai.com/account/rate-limits to learn more.', 'type': 'requests', 'param': None, 'code': 'rate_limit_exceeded'}}
+
+Prompt:
+You are playing the trick-taking card game Wizard. You must respect the game rules at all times.
+
+Essentials:
+- 60-card deck: suits RED/BLUE/GREEN/YELLOW (number cards 1–13), plus 4 WIZARD and 4 JESTER cards (no suit).
+- Trump: if the face-up card is a NUMBER, its suit is trump; if it is a JESTER, there is NO TRUMP; if it is a WIZARD, the dealer chooses any trump suit; in the last round there is NO TRUMP.
+- Trick lead: the first NUMBER card played in a trick sets the led suit, unless the trick is led with a WIZARD (no led suit is set).
+- If you have any NUMBER cards in the led suit you must play one of them, except that you may always play a WIZARD or JESTER instead.
+- If there is no led suit yet (for example because the trick was led with a WIZARD or JESTER and no NUMBER has been played), any card is legal.
+- Trick winner: if any WIZARD is played, the earliest WIZARD wins; otherwise, if there is a trump suit, the highest NUMBER in the trump suit wins; otherwise, the highest NUMBER in the led suit wins; if all cards are JESTERs, the earliest JESTER wins.
+- Card indices in your hand are 0-indexed; you may only choose an index from `legal_move_indices` when playing a card.
+- Objective: by the end of the round, win exactly the number of tricks you bid (no more and no less).
+- Scoring: if tricks_won == bid then your score change is +20 + 10 * bid; otherwise your score change is -10 * abs(tricks_won - bid). Total score is cumulative across rounds.
+- Information: you see only your own hand plus public data (trump, bids, tricks, scores). The environment has already computed `legal_move_indices` for valid plays.
+
+Follow the Wizard rules above exactly. They are fixed for this entire game and do not change between turns.
+
+Quick state digest (for fast reference; use the JSON below for full details):
+
+Player 1 bid: 2; tricks_won: 3; Trump: RED; Current trick leader: 1; Cards in hand: 4; Legal moves: [0, 1, 2, 3] -> 0: GREEN 3, 1: GREEN 1, 2: YELLOW 3, 3: BLUE 1
+
+Pick exactly one integer index from the `legal_move_indices` list in the observation. Card indices are 0-indexed within your current hand.
+Hand with indices: 0: GREEN 3, 1: GREEN 1, 2: YELLOW 3, 3: BLUE 1
+Legal move options (index -> card): 0: GREEN 3, 1: GREEN 1, 2: YELLOW 3, 3: BLUE 1
+Scoring reminder: if tricks_won == bid your score goes up by 20 + 10 * bid; otherwise your score decreases by 10 * abs(tricks_won - bid).
+If you include a rationale, keep it short, then end with FINAL_JSON: {"card_index": <integer>} with nothing after the closing brace.
+
+Here is a JSON description of the current game state from your perspective:
+
+{
+  "bids": {
+    "0": 2,
+    "1": 2,
+    "2": 3
+  },
+  "current_trick": {
+    "led_suit": null,
+    "plays": []
+  },
+  "game": {
+    "cards_per_player": 18,
+    "dealer_id": 2,
+    "game_id": "game-59",
+    "num_players": 3,
+    "round_index": 17
+  },
+  "hand": [
+    {
+      "rank": 3,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    {
+      "rank": 1,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    {
+      "rank": 3,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 1,
+      "suit": "BLUE",
+      "type": "number"
+    }
+  ],
+  "hand_sizes": {
+    "0": 4,
+    "1": 4,
+    "2": 4
+  },
+  "leader_id": 1,
+  "legal_move_indices": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "phase": "play",
+  "player": {
+    "id": 1,
+    "name": "openai:gpt-4o-mini",
+    "score": -120
+  },
+  "player_names": {
+    "0": "gemini:gemini-2.0-flash",
+    "1": "openai:gpt-4o-mini",
+    "2": "anthropic:claude-3-5-haiku-latest"
+  },
+  "scores": {
+    "0": -210,
+    "1": -120,
+    "2": -180
+  },
+  "seating_order": [
+    0,
+    1,
+    2
+  ],
+  "trick_history": [
+    {
+      "led_suit": null,
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "jester"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "jester"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 2
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "RED",
+      "plays": [
+        {
+          "card": {
+            "rank": 12,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 2,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 4,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "RED",
+      "plays": [
+        {
+          "card": {
+            "rank": 8,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 3,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 1,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "RED",
+      "plays": [
+        {
+          "card": {
+            "rank": 10,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 11,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "jester"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 0
+    },
+    {
+      "led_suit": null,
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 13,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 7,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 2
+        }
+      ],
+      "winner_id": 0
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 2,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 10,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 11,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 2
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": null,
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 4,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 12,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "RED",
+      "plays": [
+        {
+          "card": {
+            "rank": 13,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 5,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 8,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "BLUE",
+      "plays": [
+        {
+          "card": {
+            "rank": 9,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 3,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 4,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "YELLOW",
+      "plays": [
+        {
+          "card": {
+            "rank": 1,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 2,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 13,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 9,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 5,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 12,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 0
+    },
+    {
+      "led_suit": "BLUE",
+      "plays": [
+        {
+          "card": {
+            "rank": 6,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 2,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 13,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 2
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "YELLOW",
+      "plays": [
+        {
+          "card": {
+            "rank": 9,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 6,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 12,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 6,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "jester"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 7,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 1
+    }
+  ],
+  "trick_index": 14,
+  "tricks_taken_so_far": {
+    "0": 3,
+    "1": 3,
+    "2": 8
+  },
+  "trump": {
+    "card": {
+      "rank": 6,
+      "suit": "RED",
+      "type": "number"
+    },
+    "suit": "RED"
+  }
+}
+
+Keep any reasoning to a few sentences at most. End with `FINAL_JSON:` followed by ONLY the JSON object; after the `FINAL_JSON:` label, no other text or punctuation should appear after the closing brace.
+
+Observation JSON:
+{
+  "bids": {
+    "0": 2,
+    "1": 2,
+    "2": 3
+  },
+  "current_trick": {
+    "led_suit": null,
+    "plays": []
+  },
+  "game": {
+    "cards_per_player": 18,
+    "dealer_id": 2,
+    "game_id": "game-59",
+    "num_players": 3,
+    "round_index": 17
+  },
+  "hand": [
+    {
+      "rank": 3,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    {
+      "rank": 1,
+      "suit": "GREEN",
+      "type": "number"
+    },
+    {
+      "rank": 3,
+      "suit": "YELLOW",
+      "type": "number"
+    },
+    {
+      "rank": 1,
+      "suit": "BLUE",
+      "type": "number"
+    }
+  ],
+  "hand_sizes": {
+    "0": 4,
+    "1": 4,
+    "2": 4
+  },
+  "leader_id": 1,
+  "legal_move_indices": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "phase": "play",
+  "player": {
+    "id": 1,
+    "name": "openai:gpt-4o-mini",
+    "score": -120
+  },
+  "player_names": {
+    "0": "gemini:gemini-2.0-flash",
+    "1": "openai:gpt-4o-mini",
+    "2": "anthropic:claude-3-5-haiku-latest"
+  },
+  "scores": {
+    "0": -210,
+    "1": -120,
+    "2": -180
+  },
+  "seating_order": [
+    0,
+    1,
+    2
+  ],
+  "trick_history": [
+    {
+      "led_suit": null,
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "jester"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "jester"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 2
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "RED",
+      "plays": [
+        {
+          "card": {
+            "rank": 12,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 2,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 4,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "RED",
+      "plays": [
+        {
+          "card": {
+            "rank": 8,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 3,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 1,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "RED",
+      "plays": [
+        {
+          "card": {
+            "rank": 10,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 11,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "jester"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 0
+    },
+    {
+      "led_suit": null,
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 13,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 7,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 2
+        }
+      ],
+      "winner_id": 0
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 2,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 10,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 11,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 2
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": null,
+      "plays": [
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "wizard"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 4,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 12,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "RED",
+      "plays": [
+        {
+          "card": {
+            "rank": 13,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 5,
+            "suit": "RED",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 8,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "BLUE",
+      "plays": [
+        {
+          "card": {
+            "rank": 9,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 3,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 4,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "YELLOW",
+      "plays": [
+        {
+          "card": {
+            "rank": 1,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 2,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 13,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 9,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 5,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 12,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 0
+    },
+    {
+      "led_suit": "BLUE",
+      "plays": [
+        {
+          "card": {
+            "rank": 6,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 2,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": 13,
+            "suit": "BLUE",
+            "type": "number"
+          },
+          "player_id": 2
+        }
+      ],
+      "winner_id": 2
+    },
+    {
+      "led_suit": "YELLOW",
+      "plays": [
+        {
+          "card": {
+            "rank": 9,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 6,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 0
+        },
+        {
+          "card": {
+            "rank": 12,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 1
+        }
+      ],
+      "winner_id": 1
+    },
+    {
+      "led_suit": "GREEN",
+      "plays": [
+        {
+          "card": {
+            "rank": 6,
+            "suit": "GREEN",
+            "type": "number"
+          },
+          "player_id": 1
+        },
+        {
+          "card": {
+            "rank": null,
+            "suit": null,
+            "type": "jester"
+          },
+          "player_id": 2
+        },
+        {
+          "card": {
+            "rank": 7,
+            "suit": "YELLOW",
+            "type": "number"
+          },
+          "player_id": 0
+        }
+      ],
+      "winner_id": 1
+    }
+  ],
+  "trick_index": 14,
+  "tricks_taken_so_far": {
+    "0": 3,
+    "1": 3,
+    "2": 8
+  },
+  "trump": {
+    "card": {
+      "rank": 6,
+      "suit": "RED",
+      "type": "number"
+    },
+    "suit": "RED"
+  }
+}

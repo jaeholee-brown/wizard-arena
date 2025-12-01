@@ -15,71 +15,18 @@ from .random_agent import RandomWizardAgent
 from ..llm_clients import LLMRouter, ModelSpec
 from ..verbose_logger import FailureLogger, VerboseGameLogger
 
-WIZARD_RULES_SUMMARY = """
-Game: Wizard, a trick-taking game.
-
-Deck:
-- 60 cards total.
-- Suits: RED, BLUE, GREEN, YELLOW.
-- Number cards: 1–13 in each suit (1 lowest, 13 highest).
-- 4 WIZARD cards and 4 JESTER cards (no suit, no rank).
-
-Rounds & trump:
-- Round r: each player is dealt r cards from a shuffled deck.
-- One extra card may be turned face up to set trump:
-  - If it is a number card, its suit is the trump suit.
-  - If it is a JESTER, there is NO TRUMP this round.
-  - If it is a WIZARD, the dealer chooses the trump suit.
-- In the last round there is NO TRUMP (no card is turned up).
-- In JSON, trump_suit is "RED" / "BLUE" / "GREEN" / "YELLOW" or null for no trump.
-
-Tricks:
-- Each round has r tricks; in each trick every player plays exactly one card.
-- The first player to play leads the trick.
-- The first NUMBER card played defines the led suit.
-- If you have any NUMBER cards in the led suit, you must play one of them,
-  except you may always play WIZARD or JESTER instead.
-- If you have no NUMBER cards in the led suit, you may play any card.
-
-Winning a trick:
-- If any WIZARD is played, the FIRST WIZARD played wins the trick.
-- Otherwise, if there is a trump suit:
-  - Highest NUMBER card of the trump suit (rank 1–13) wins.
-- Otherwise:
-  - Highest NUMBER card of the led suit wins.
-- If all cards are JESTERS (no Wizards, no number cards), the FIRST JESTER wins.
-
-Bidding & scoring:
-- Before playing tricks in a round, each player bids how many tricks they expect to win.
-- After the round:
-  - If tricks_won == bid: score change = 20 + 10 * tricks_won.
-  - Otherwise: score change = -10 * |tricks_won - bid|.
-- Total score is the sum of all round score changes.
-
-Information & legality:
-- You only see your own hand plus public information (trump, bids, tricks, scores).
-- The environment enforces the rules and provides `legal_move_indices` in the JSON:
-  those are the ONLY hand indices you are allowed to choose when playing a card.
-
-Observation JSON fields (key parts):
-- game: round_index, cards_per_player, num_players, dealer_id.
-- player: your id, name, score.
-- trump: {suit, card}; scores: map of total scores; seating_order + player_names.
-- Bidding phase adds: phase="bidding", hand, bids_so_far, bidding_order, current_bidder_seat_index.
-- Play phase adds: phase="play", hand, legal_move_indices, trick_index, leader_id (player who led this current trick),
-  current_trick (plays so far and led_suit), trick_history (prior tricks with led_suit/winner),
-  bids, tricks_taken_so_far, hand_sizes (cards remaining per player).
-""".strip()
-
 ESSENTIAL_RULES = """
 Essentials:
-- 60-card deck: suits RED/BLUE/GREEN/YELLOW (1–13), plus 4 WIZARD, 4 JESTER.
-- Trump suit may be set; None if Jester or last round.
-- Trick lead: first NUMBER sets led suit unless led with WIZARD (no led suit).
-- If you have any cards with a NUMBER in led suit you must pick one of them and play it (but Wizard/Jester always legal).
-- Trick winner: earliest WIZARD; else highest trump number; else highest led-suit number; if only JESTERs, earliest wins.
-- Card indices in hand are 0-indexed; play only an index from legal_move_indices.
-- Objective: at the end of the round, win exactly the number of tricks you expected to win, no more and no less.
+- 60-card deck: suits RED/BLUE/GREEN/YELLOW (number cards 1–13), plus 4 WIZARD and 4 JESTER cards (no suit).
+- Trump: if the face-up card is a NUMBER, its suit is trump; if it is a JESTER, there is NO TRUMP; if it is a WIZARD, the dealer chooses any trump suit; in the last round there is NO TRUMP.
+- Trick lead: the first NUMBER card played in a trick sets the led suit, unless the trick is led with a WIZARD (no led suit is set).
+- If you have any NUMBER cards in the led suit you must play one of them, except that you may always play a WIZARD or JESTER instead.
+- If there is no led suit yet (for example because the trick was led with a WIZARD or JESTER and no NUMBER has been played), any card is legal.
+- Trick winner: if any WIZARD is played, the earliest WIZARD wins; otherwise, if there is a trump suit, the highest NUMBER in the trump suit wins; otherwise, the highest NUMBER in the led suit wins; if all cards are JESTERs, the earliest JESTER wins.
+- Card indices in your hand are 0-indexed; you may only choose an index from `legal_move_indices` when playing a card.
+- Objective: by the end of the round, win exactly the number of tricks you bid (no more and no less).
+- Scoring: if tricks_won == bid then your score change is +20 + 10 * bid; otherwise your score change is -10 * abs(tricks_won - bid). Total score is cumulative across rounds.
+- Information: you see only your own hand plus public data (trump, bids, tricks, scores). The environment has already computed `legal_move_indices` for valid plays.
 """.strip()
 
 logger = logging.getLogger(__name__)
@@ -184,6 +131,68 @@ class LLMWizardAgent(WizardAgent):
                 indent=2,
             )
 
+    def _describe_card(self, card: Dict[str, Any]) -> str:
+        """Return a human-friendly string for a card dict."""
+        ctype = (card or {}).get("type")
+        if ctype == "number":
+            suit = (card.get("suit") or "").upper()
+            rank = card.get("rank")
+            return f"{suit} {rank}"
+        if ctype == "wizard":
+            return "WIZARD"
+        if ctype == "jester":
+            return "JESTER"
+        return "UNKNOWN"
+
+    def _format_hand_indices(self, hand: list[Dict[str, Any]]) -> str:
+        """Produce '0: RED 5, 1: JESTER' style mapping for the hand."""
+        if not hand:
+            return "<empty hand>"
+        parts = [f"{i}: {self._describe_card(card)}" for i, card in enumerate(hand)]
+        return ", ".join(parts)
+
+    def _format_legal_options(
+        self,
+        hand: list[Dict[str, Any]],
+        legal_indices: list[int],
+    ) -> str:
+        """Map legal indices to their card descriptions."""
+        if not legal_indices:
+            return "<none provided>"
+        parts = []
+        for idx in legal_indices:
+            card = hand[idx] if 0 <= idx < len(hand) else None
+            parts.append(f"{idx}: {self._describe_card(card or {})}")
+        return ", ".join(parts)
+
+    def _state_digest(self, observation: Dict[str, Any]) -> str:
+        """Construct a compact digest for quick reference."""
+        player = observation.get("player") or {}
+        pid = player.get("id")
+
+        trump = (observation.get("trump") or {}).get("suit") or "NONE"
+        leader = observation.get("leader_id")
+        bids = observation.get("bids") or observation.get("bids_so_far") or {}
+        your_bid = bids.get(pid)
+        tricks_taken = observation.get("tricks_taken_so_far") or {}
+        tricks_won = tricks_taken.get(pid, 0)
+        legal_indices = observation.get("legal_move_indices") or []
+        hand = observation.get("hand") or []
+
+        parts = [
+            f"Player {pid} bid: {your_bid if your_bid is not None else '<none>'}; tricks_won: {tricks_won}",
+            f"Trump: {trump}",
+        ]
+        if leader is not None:
+            parts.append(f"Current trick leader: {leader}")
+        parts.append(f"Cards in hand: {len(hand)}")
+        if legal_indices:
+            parts.append(
+                f"Legal moves: {legal_indices} -> {self._format_legal_options(hand, legal_indices)}"
+            )
+
+        return "; ".join(parts)
+
     def _build_prompt(
         self,
         *,
@@ -202,19 +211,17 @@ class LLMWizardAgent(WizardAgent):
             "You must respect the game rules at all times.",
             ESSENTIAL_RULES,
         ]
-        if not self._rules_prompt_sent:
-            prefix_lines.append("Rules summary:")
-            prefix_lines.append(WIZARD_RULES_SUMMARY)
+        prefix_lines.append(
+            "Follow the Wizard rules above exactly. They are fixed for this entire game and do not change between turns."
+        )
+        self._rules_prompt_sent = True
+
+        digest = self._state_digest(observation)
+        if digest:
             prefix_lines.append(
-                "This rules summary will only be sent once per game. "
-                "Remember and follow it for every turn."
+                "Quick state digest (for fast reference; use the JSON below for full details):"
             )
-            self._rules_prompt_sent = True
-        else:
-            prefix_lines.append(
-                "Use the exact same rules you were given at the start of this game; "
-                "they will not be repeated."
-            )
+            prefix_lines.append(digest)
 
         prefix_lines.append(instruction_suffix)
         prefix_lines.append(
@@ -222,7 +229,7 @@ class LLMWizardAgent(WizardAgent):
         )
         prefix_lines.append(obs_json)
         prefix_lines.append(
-            "Keep any reasoning to a few short sentences at most. "
+            "Keep any reasoning to a few sentences at most. "
             "End with `FINAL_JSON:` followed by ONLY the JSON object; after the "
             "`FINAL_JSON:` label, no other text or punctuation should appear after the closing brace."
         )
@@ -439,7 +446,11 @@ class LLMWizardAgent(WizardAgent):
             f"Legal bids are integers from 0 to {cards_per_player} inclusive.\n"
             "Your goal is to finish the round with tricks_won matching your bid, "
             "not to take every trick.\n"
-            "If you include a rationale, keep it to one short sentence maximum, then end with "
+            f"Your hand (index -> card): {self._format_hand_indices(observation.get('hand') or [])}\n"
+            "Scoring reminder: if tricks_won == bid your score goes up by 20 + 10 * bid; "
+            "otherwise your score decreases by 10 * abs(tricks_won - bid).\n"
+            "Plan across the full round, and consider the number of players and tricks available to be won.\n"
+            "If you include a rationale, keep it short, then end with "
             'FINAL_JSON: {"bid": <integer>} with nothing after the closing brace.'
         )
 
@@ -504,10 +515,21 @@ class LLMWizardAgent(WizardAgent):
             "Always output valid JSON."
         )
         allowed_str = ", ".join(allowed)
+        top_card_desc = self._describe_card(observation.get("top_card") or {})
+        game_info = observation.get("game") or {}
+        round_number = int(game_info.get("round_index", 0)) + 1
+        total_rounds = observation.get("rounds_total")
+        tricks_this_round = observation.get("tricks_this_round")
+        round_blurb = f"Round {round_number}" + (
+            f" of {total_rounds}" if total_rounds is not None else ""
+        )
         instruction_suffix = (
             "Choose one trump suit from the allowed options.\n"
             f"Allowed trump_suit values: {allowed_str}.\n"
-            "If you include a rationale, keep it to one short sentence maximum, then end with "
+            f"Top card was a Wizard ({top_card_desc}), so you may choose any trump suit.\n"
+            f"{round_blurb}; tricks this round: {tricks_this_round}.\n"
+            "Pick the suit that maximizes your expected total score by the end of the game.\n"
+            "If you include a rationale, keep it short, then end with "
             'FINAL_JSON: {"trump_suit": <string>} with nothing after the closing brace.'
         )
 
@@ -624,9 +646,11 @@ class LLMWizardAgent(WizardAgent):
         instruction_suffix = (
             "Pick exactly one integer index from the `legal_move_indices` list "
             "in the observation. Card indices are 0-indexed within your current hand.\n"
-            "Steer toward finishing the round with tricks_won matching your bid: "
-            "avoid extra tricks if you are already at your bid; press to win when behind your bid.\n"
-            "If you include a rationale, keep it to one short sentence maximum, then end with "
+            f"Hand with indices: {self._format_hand_indices(observation.get('hand') or [])}\n"
+            f"Legal move options (index -> card): {self._format_legal_options(observation.get('hand') or [], legal_indices)}\n"
+            "Scoring reminder: if tricks_won == bid your score goes up by 20 + 10 * bid; "
+            "otherwise your score decreases by 10 * abs(tricks_won - bid).\n"
+            "If you include a rationale, keep it short, then end with "
             'FINAL_JSON: {"card_index": <integer>} with nothing after the closing brace.'
         )
 

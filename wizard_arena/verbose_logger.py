@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from threading import Lock
 from typing import Any, Dict, List, Optional
 
 
@@ -11,6 +12,7 @@ class VerboseGameLogger:
     def __init__(self, path: Path) -> None:
         self.path = Path(path)
         self._entries: List[str] = []
+        self._lock = Lock()
 
     def log_interaction(
         self,
@@ -83,12 +85,18 @@ class VerboseGameLogger:
                 ]
             )
 
-        self._entries.append("\n".join(lines).strip())
+        entry = "\n".join(lines).strip()
+        with self._lock:
+            self._entries.append(entry)
 
     def flush(self) -> None:
-        if not self._entries:
-            return
-        self.path.write_text("\n\n".join(self._entries), encoding="utf-8")
+        with self._lock:
+            if not self._entries:
+                return
+            to_write = "\n\n".join(self._entries)
+            self._entries.clear()
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        self.path.write_text(to_write, encoding="utf-8")
 
 
 class FailureLogger:
@@ -97,6 +105,7 @@ class FailureLogger:
     def __init__(self, path: Path) -> None:
         self.path = Path(path)
         self._entries: List[str] = []
+        self._lock = Lock()
 
     def log_failure(
         self,
@@ -137,9 +146,15 @@ class FailureLogger:
         if parsed_json is not None:
             lines.extend(["", "Parsed JSON object:", repr(parsed_json)])
 
-        self._entries.append("\n".join(lines).strip())
+        entry = "\n".join(lines).strip()
+        with self._lock:
+            self._entries.append(entry)
 
     def flush(self) -> None:
-        if not self._entries:
-            return
-        self.path.write_text("\n\n".join(self._entries), encoding="utf-8")
+        with self._lock:
+            if not self._entries:
+                return
+            to_write = "\n\n".join(self._entries)
+            self._entries.clear()
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        self.path.write_text(to_write, encoding="utf-8")

@@ -2,10 +2,17 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-# ---- 1. Load data ----
-# Change this to your actual path
-csv_path = "wizard_results_seed1_50games.csv"
+# ---- 1. Load data & filter games with exactly 60 rows ----
+csv_path = "wizard_arena/results/wizard_results_60_games.csv"   # <- change to your path
 df = pd.read_csv(csv_path)
+
+### Count rows per game_id
+counts = df['game_id'].value_counts()
+
+### Keep only game_ids that appear in exactly 60 rows
+valid_games = counts[counts == 60].index
+df = df[df['game_id'].isin(valid_games)].copy()
+
 
 # Expecting at least these columns:
 # 'game_id', 'round_index', 'player_name', 'total_score'

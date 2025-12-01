@@ -121,7 +121,11 @@ class GameEngine:
                 # Dealer chooses trump suit.
                 dealer_agent = self.agents[dealer_id]
                 obs = self._build_trump_observation(
-                    dealer_id, round_index, cards_per_player, hands[dealer_id]
+                    dealer_id,
+                    round_index,
+                    cards_per_player,
+                    hands[dealer_id],
+                    trump_card,
                 )
                 dealer_choice = dealer_agent.choose_trump(obs)
 
@@ -312,6 +316,7 @@ class GameEngine:
         round_index: int,
         cards_per_player: int,
         hand: List[Card],
+        top_card: Card,
     ) -> Dict[str, Any]:
         # Lightweight synthetic RoundState for context.
         tmp_round = RoundState(
@@ -326,4 +331,8 @@ class GameEngine:
         obs["phase"] = "choose_trump"
         obs["hand_cards"] = hand[:]  # actual Card objects
         obs["hand"] = [card_to_dict(c) for c in hand]
+        obs["top_card"] = card_to_dict(top_card)
+        obs["rounds_total"] = self.max_rounds
+        obs["rounds_remaining"] = self.max_rounds - round_index
+        obs["tricks_this_round"] = cards_per_player
         return obs
