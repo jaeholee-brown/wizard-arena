@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # ---- 1. Load data & filter games with exactly 60 rows ----
-csv_path = "wizard_arena/results/wizard_results_60_games.csv"   # <- change to your path
+csv_path = "wizard_arena/results/wizard_benchmark_scores.csv"   # <- change to your path
 df = pd.read_csv(csv_path)
 
 ### Count rows per game_id

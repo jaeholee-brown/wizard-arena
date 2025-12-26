@@ -4,10 +4,13 @@ from __future__ import annotations
 import json
 import logging
 import os
+import time
 from dataclasses import dataclass
 from typing import Optional
 
 from dotenv import load_dotenv
+
+from .litellm_cost_tracker import running_cost_tracker
 
 logger = logging.getLogger(__name__)
 
@@ -111,6 +114,7 @@ class LLMRouter:
         model = model_spec.model
         max_tokens = max_output_tokens or self.max_output_tokens
         temp = self._effective_temperature(temperature)
+        messages = self._build_messages(prompt=prompt, system_prompt=system_prompt)
 
         logger.debug(
             "LLMRouter.complete provider=%s model=%s max_output_tokens=%s temperature=%s",
@@ -120,18 +124,38 @@ class LLMRouter:
             temp,
         )
 
+        start_time = time.time()
+        response_obj = None
+        text_output: str
+
         if provider == "openai":
-            return self._complete_openai(model, prompt, system_prompt, max_tokens, temp)
-        if provider == "anthropic":
-            return self._complete_anthropic(
+            text_output, response_obj = self._complete_openai(
+                model, prompt, system_prompt, max_tokens, temp, messages
+            )
+        elif provider == "anthropic":
+            text_output, response_obj = self._complete_anthropic(
                 model, prompt, system_prompt, max_tokens, temp
             )
-        if provider == "gemini":
-            return self._complete_gemini(model, prompt, system_prompt, max_tokens, temp)
-        if provider == "grok":
-            return self._complete_grok(model, prompt, system_prompt, max_tokens, temp)
+        elif provider == "gemini":
+            text_output, response_obj = self._complete_gemini(
+                model, prompt, system_prompt, max_tokens, temp
+            )
+        elif provider == "grok":
+            text_output, response_obj = self._complete_grok(
+                model, prompt, system_prompt, max_tokens, temp
+            )
+        else:
+            raise ValueError(f"Unsupported provider: {provider}")
 
-        raise ValueError(f"Unsupported provider: {provider}")
+        latency = time.time() - start_time
+        self._log_cost(
+            model_spec=model_spec,
+            messages=messages,
+            output_text=text_output,
+            raw_response=response_obj,
+            latency_seconds=latency,
+        )
+        return text_output
 
     # --- Provider-specific helpers -------------------------------------
 
@@ -139,6 +163,41 @@ class LLMRouter:
         if override is None:
             return self.temperature
         return float(override)
+
+    def _build_messages(
+        self, *, prompt: str, system_prompt: Optional[str]
+    ) -> list[dict[str, str]]:
+        messages = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+        messages.append({"role": "user", "content": prompt})
+        return messages
+
+    def _log_cost(
+        self,
+        *,
+        model_spec: ModelSpec,
+        messages: list[dict[str, str]],
+        output_text: str,
+        raw_response: object,
+        latency_seconds: float,
+    ) -> None:
+        """Record cost/usage for a completed LLM call."""
+        try:
+            running_cost_tracker.record_completion(
+                model=model_spec.model,
+                model_label=model_spec.label,
+                messages=messages,
+                output_text=output_text,
+                raw_usage=raw_response,
+                latency_seconds=latency_seconds,
+            )
+        except Exception:
+            logger.debug(
+                "Failed to log LiteLLM cost for %s",
+                model_spec,
+                exc_info=True,
+            )
 
     # OpenAI (Responses API)
     def _ensure_openai(self):
@@ -165,19 +224,14 @@ class LLMRouter:
         system_prompt: Optional[str],
         max_output_tokens: int,
         temperature: float,
-    ) -> str:
+        messages: list[dict[str, str]],
+    ) -> tuple[str, object]:
         self._ensure_openai()
         assert self._openai_client is not None
 
         # Use the Responses API with chat-style messages if a system prompt is
         # provided, otherwise send plain text input. :contentReference[oaicite:5]{index=5}
-        if system_prompt:
-            input_payload = [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": prompt},
-            ]
-        else:
-            input_payload = prompt
+        input_payload = messages if system_prompt else prompt
 
         request_kwargs = {
             "model": model,
@@ -204,7 +258,7 @@ class LLMRouter:
         text = response.output_text  # type: ignore[attr-defined]
         if not isinstance(text, str):
             text = json.dumps(text)
-        return text
+        return text, response
 
     def _is_temperature_unsupported_error(self, exc: Exception) -> bool:
         """Return True if an OpenAI error indicates temperature is unsupported."""
@@ -236,7 +290,7 @@ class LLMRouter:
         system_prompt: Optional[str],
         max_output_tokens: int,
         temperature: float,
-    ) -> str:
+    ) -> tuple[str, object]:
         self._ensure_anthropic()
         assert self._anthropic_client is not None
 
@@ -254,7 +308,7 @@ class LLMRouter:
             text = getattr(block, "text", None)
             if text:
                 parts.append(text)
-        return "".join(parts)
+        return "".join(parts), message
 
     # Google Gemini via google-genai
     def _ensure_gemini(self):
@@ -282,7 +336,7 @@ class LLMRouter:
         system_prompt: Optional[str],
         max_output_tokens: int,
         temperature: float,
-    ) -> str:
+    ) -> tuple[str, object]:
         self._ensure_gemini()
         assert self._gemini_client is not None
         from google.genai import types  # type: ignore
@@ -300,8 +354,8 @@ class LLMRouter:
         )
         text = getattr(response, "text", None)
         if not isinstance(text, str):
-            return str(response)
-        return text
+            return str(response), response
+        return text, response
 
     # Grok via OpenAI SDK pointed at xAI's API endpoint
     def _ensure_grok(self):
@@ -334,7 +388,7 @@ class LLMRouter:
         system_prompt: Optional[str],
         max_output_tokens: int,
         temperature: float,
-    ) -> str:
+    ) -> tuple[str, object]:
         self._ensure_grok()
         assert self._grok_client is not None
 
@@ -352,8 +406,11 @@ class LLMRouter:
         choice = completion.choices[0]
         content = getattr(choice.message, "content", "")  # type: ignore[attr-defined]
         if isinstance(content, str):
-            return content
+            return content, completion
         try:
-            return "".join(part["text"] for part in content if "text" in part)  # type: ignore[index]
+            return (
+                "".join(part["text"] for part in content if "text" in part),  # type: ignore[index]
+                completion,
+            )
         except Exception:
-            return str(content)
+            return str(content), completion

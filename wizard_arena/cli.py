@@ -14,6 +14,7 @@ from .agents import LLMCallFailed, LLMWizardAgent
 from .engine import GameEngine
 from .game_log import FIELDNAMES, build_round_score_rows
 from .llm_clients import LLMRouter, ModelSpec
+from .litellm_cost_tracker import running_cost_tracker
 from .paths import ensure_results_dir, resolve_results_path
 from .verbose_logger import FailureLogger, VerboseGameLogger
 
@@ -323,6 +324,7 @@ async def async_main(argv: List[str] | None = None) -> None:
             recommended_parallel,
         )
     logging.info("Running up to %d game(s) concurrently", parallel_games)
+    running_cost_tracker.start_run()
 
     verbose_logger = (
         VerboseGameLogger(verbose_path)
@@ -403,6 +405,8 @@ async def async_main(argv: List[str] | None = None) -> None:
         verbose_logger.flush()
     if failure_logger:
         failure_logger.flush()
+    running_cost_tracker.persist()
+    running_cost_tracker.log_run_summary()
 
 
 def main(argv: List[str] | None = None) -> None:

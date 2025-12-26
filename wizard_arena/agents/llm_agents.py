@@ -229,7 +229,7 @@ class LLMWizardAgent(WizardAgent):
         )
         prefix_lines.append(obs_json)
         prefix_lines.append(
-            "Keep any reasoning to a few sentences at most. "
+            "If you include reasoning, place it before `FINAL_JSON:`. "
             "End with `FINAL_JSON:` followed by ONLY the JSON object; after the "
             "`FINAL_JSON:` label, no other text or punctuation should appear after the closing brace."
         )
@@ -450,7 +450,7 @@ class LLMWizardAgent(WizardAgent):
             "Scoring reminder: if tricks_won == bid your score goes up by 20 + 10 * bid; "
             "otherwise your score decreases by 10 * abs(tricks_won - bid).\n"
             "Plan across the full round, and consider the number of players and tricks available to be won.\n"
-            "If you include a rationale, keep it short, then end with "
+            "You may include a rationale, then end with "
             'FINAL_JSON: {"bid": <integer>} with nothing after the closing brace.'
         )
 
@@ -529,7 +529,7 @@ class LLMWizardAgent(WizardAgent):
             f"Top card was a Wizard ({top_card_desc}), so you may choose any trump suit.\n"
             f"{round_blurb}; tricks this round: {tricks_this_round}.\n"
             "Pick the suit that maximizes your expected total score by the end of the game.\n"
-            "If you include a rationale, keep it short, then end with "
+            "You may include a rationale, then end with "
             'FINAL_JSON: {"trump_suit": <string>} with nothing after the closing brace.'
         )
 
@@ -650,7 +650,7 @@ class LLMWizardAgent(WizardAgent):
             f"Legal move options (index -> card): {self._format_legal_options(observation.get('hand') or [], legal_indices)}\n"
             "Scoring reminder: if tricks_won == bid your score goes up by 20 + 10 * bid; "
             "otherwise your score decreases by 10 * abs(tricks_won - bid).\n"
-            "If you include a rationale, keep it short, then end with "
+            "You may include a rationale, then end with "
             'FINAL_JSON: {"card_index": <integer>} with nothing after the closing brace.'
         )
 
